@@ -36,6 +36,17 @@ Open NeoVim and run `:PlugInstall`
 
 Once the installation is done, restart NeoVim.
 
+## Updating the config
+
+To update the config, pull the latest changes from this repo.
+
+```bash
+cd ~/.config/nvim
+git pull
+```
+
+Once the config is updated, open NeoVim and run `:PlugClean` and `:PlugInstall`.
+
 ## Trouble Shooting
 
 ### Error installing markdown-preview.nvim
