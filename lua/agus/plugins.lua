@@ -48,5 +48,8 @@ Plug('christoomey/vim-tmux-navigator')
 -- Git Diff
 Plug('mhinz/vim-signify')
 
+-- Markdown preview
+Plug('iamcco/markdown-preview.nvim', { ['do'] = 'cd app && npx --yes yarn install' })
+
 vim.call('plug#end')
 
