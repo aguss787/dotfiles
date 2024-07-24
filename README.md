@@ -36,3 +36,11 @@ Open NeoVim and run `:PlugInstall`
 
 Once the installation is done, restart NeoVim.
 
+## Trouble Shooting
+
+### Error installing markdown-preview.nvim
+
+If you see an error installing `markdown-preview.nvim`, you might be missing either `npm` or `yarn`. Make sure you have both installed.
+Comment out the line in `plugins.lua` that installs `markdown-preview.nvim`, restart NeoVim, and run `:PlugClean`.
+After `markdown-preview.nvim` is removed, uncomment the line in `plugins.lua`, restart NeoVim, and run `:PlugInstall` again.
+
