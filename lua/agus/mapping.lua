@@ -7,11 +7,12 @@ vim.api.nvim_set_keymap('n', '<leader>/', '<cmd>noh<CR>', { noremap = true, sile
 vim.api.nvim_set_keymap('n', '<leader>p', '<cmd>NERDTreeFocus<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<C-p>', '<cmd>NERDTreeToggle<CR>', { noremap = true, silent = true })
 
--- Telescope
-vim.api.nvim_set_keymap('n', '<leader>ff', '<cmd>Telescope find_files<cr>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>fg', '<cmd>Telescope live_grep<cr>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>fb', '<cmd>Telescope buffers<cr>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>fh', '<cmd>Telescope help_tags<cr>', { noremap = true, silent = true })
+local telescope = require('telescope.builtin')
+vim.keymap.set('n', '<leader>ff', telescope.find_files, {})
+vim.keymap.set('n', '<leader>fg', telescope.live_grep, {})
+vim.keymap.set('n', '<leader>fb', telescope.buffers, {})
+vim.keymap.set('n', '<leader>fh', telescope.help_tags, {})
+vim.keymap.set('n', '<leader>fd', telescope.diagnostics, {})
 
 -- Neotest
 vim.api.nvim_set_keymap('n', 'tt', '<cmd>lua require(\'neotest\').run.run()<CR>', { noremap = true, silent = true })
