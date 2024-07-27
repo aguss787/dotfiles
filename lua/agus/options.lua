@@ -10,3 +10,6 @@ vim.opt.autoindent = true
 
 vim.opt.mouse = ''
 
+vim.opt.foldlevel = 99
+vim.opt.foldmethod = 'syntax'
+
