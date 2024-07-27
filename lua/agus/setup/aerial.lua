@@ -13,4 +13,9 @@ require("aerial").setup({
 	lsp = {
 		diagnostics_trigger_update = true,
 	},
+
+	autojump = true,
+	keymaps = {
+		["o"] = "actions.jump"
+	}
 });
