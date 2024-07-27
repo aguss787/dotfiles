@@ -34,8 +34,3 @@ vim.keymap.set('n', '<C-i><C-i>', vim.lsp.buf.code_action, {})
 vim.keymap.set('v', '<C-i>', vim.lsp.buf.code_action, {})
 vim.keymap.set('n', '<C-i>r', vim.lsp.buf.rename, {})
 
--- Possession
-vim.api.nvim_set_keymap('n', '<leader>ss', '<cmd>lua require(\'nvim-possession\').list()<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>sn', '<cmd>lua require(\'nvim-possession\').new()<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>su', '<cmd>lua require(\'nvim-possession\').update()<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>sd', '<cmd>lua require(\'nvim-possession\').delete()<CR>', { noremap = true, silent = true })
