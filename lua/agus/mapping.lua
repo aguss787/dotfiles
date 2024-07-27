@@ -43,3 +43,7 @@ local aerial = require('aerial')
 vim.keymap.set('n', '<C-a>', aerial.toggle, {})
 vim.keymap.set('n', '<leader>a', aerial.open, {})
 
+-- UFO
+local ufo = require('ufo')
+vim.keymap.set('n', 'zp', ufo.peekFoldedLinesUnderCursor, {})
+

@@ -8,6 +8,7 @@ require('agus.setup.neotest')
 require('agus.setup.rustaceanvim')
 require('agus.setup.nerdtree')
 require('agus.setup.aerial')
+require('agus.setup.ufo')
 
 require('agus.options')
 require('agus.mapping')

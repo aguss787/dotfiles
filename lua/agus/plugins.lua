@@ -53,5 +53,9 @@ Plug('mhinz/vim-signify')
 -- Markdown preview
 Plug('iamcco/markdown-preview.nvim', { ['do'] = 'cd app && npx --yes yarn install' })
 
+-- UFO
+Plug('kevinhwang91/promise-async')
+Plug('kevinhwang91/nvim-ufo')
+
 vim.call('plug#end')
 
