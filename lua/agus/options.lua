@@ -14,3 +14,6 @@ vim.o.foldcolumn = '0'
 vim.opt.foldlevel = 99
 vim.opt.foldenable = true
 
+-- Autoformat on save
+vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
+
