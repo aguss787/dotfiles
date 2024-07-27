@@ -18,6 +18,8 @@ Plug('mrcjkb/rustaceanvim')
 Plug('hrsh7th/vim-vsnip')
 Plug('hrsh7th/vim-vsnip-integ')
 
+Plug('stevearc/aerial.nvim')
+
 -- Code completion
 Plug('neovim/nvim-lspconfig')
 Plug('hrsh7th/cmp-nvim-lsp')

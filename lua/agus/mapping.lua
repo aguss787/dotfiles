@@ -7,13 +7,16 @@ vim.api.nvim_set_keymap('n', '<leader>/', '<cmd>noh<CR>', { noremap = true, sile
 vim.api.nvim_set_keymap('n', '<leader>p', '<cmd>NERDTreeFocus<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<C-p>', '<cmd>NERDTreeToggle<CR>', { noremap = true, silent = true })
 
-local telescope = require('telescope.builtin')
-vim.keymap.set('n', '<leader>ff', telescope.find_files, {})
-vim.keymap.set('n', '<leader>fg', telescope.live_grep, {})
-vim.keymap.set('n', '<leader>fb', telescope.buffers, {})
-vim.keymap.set('n', '<leader>fh', telescope.help_tags, {})
-vim.keymap.set('n', '<leader>fd', telescope.diagnostics, {})
-vim.keymap.set('n', '<leader>fs', telescope.git_status, {})
+local telescrop_builtin = require('telescope.builtin')
+vim.keymap.set('n', '<leader>ff', telescrop_builtin.find_files, {})
+vim.keymap.set('n', '<leader>fg', telescrop_builtin.live_grep, {})
+vim.keymap.set('n', '<leader>fb', telescrop_builtin.buffers, {})
+vim.keymap.set('n', '<leader>fh', telescrop_builtin.help_tags, {})
+vim.keymap.set('n', '<leader>fd', telescrop_builtin.diagnostics, {})
+vim.keymap.set('n', '<leader>fs', telescrop_builtin.git_status, {})
+
+local telescope = require('telescope')
+vim.keymap.set('n', '<leader>fa', telescope.extensions.aerial.aerial, {})
 
 -- Neotest
 local neotest = require('neotest')
@@ -34,4 +37,9 @@ vim.keymap.set('n', 'gr', vim.lsp.buf.references, {})
 vim.keymap.set('n', '<C-u><C-u>', vim.lsp.buf.code_action, {})
 vim.keymap.set('v', '<C-u>', vim.lsp.buf.code_action, {})
 vim.keymap.set('n', '<C-u>r', vim.lsp.buf.rename, {})
+
+-- Aerial
+local aerial = require('aerial')
+vim.keymap.set('n', '<C-a>', aerial.toggle, {})
+vim.keymap.set('n', '<leader>a', aerial.open, {})
 
