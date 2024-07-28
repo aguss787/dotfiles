@@ -47,3 +47,10 @@ vim.keymap.set('n', '<leader>a', aerial.open, {})
 local ufo = require('ufo')
 vim.keymap.set('n', 'zp', ufo.peekFoldedLinesUnderCursor, {})
 
+-- Markdown preview
+vim.keymap.set('n', '<leader>mp', function() vim.cmd('MarkdownPreview') end, {})
+
+-- XdgOpenLog
+local xdg_open_log = require('agus.functions.xdg-open-log')
+vim.keymap.set('n', '<leader>x', xdg_open_log.xdgOpenLog, {})
+

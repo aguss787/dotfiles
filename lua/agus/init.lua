@@ -10,6 +10,8 @@ require('agus.setup.nerdtree')
 require('agus.setup.aerial')
 require('agus.setup.ufo')
 
+require('agus.functions.xdg-open-log')
+
 require('agus.options')
 require('agus.mapping')
 

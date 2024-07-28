@@ -59,3 +59,18 @@ If you see an error installing `markdown-preview.nvim`, you might be missing eit
 Comment out the line in `plugins.lua` that installs `markdown-preview.nvim`, restart NeoVim, and run `:PlugClean`.
 After `markdown-preview.nvim` is removed, uncomment the line in `plugins.lua`, restart NeoVim, and run `:PlugInstall` again.
 
+## xdg-open-log
+
+xdg-open-log is a simple command that read `$HOME/xdg-open.log`. This file format is not standard in anyway,
+but it's a nice work around for working with xdg-open in a remote server. To set this up, configure xdg-open to
+write to `$HOME/xdg-open.log`.
+
+If you are working with a remote server, there's a high chance that it doesn't have xd-open. Add the following script
+as `xdg-open` in your `$PATH`:
+
+```bash
+#!/bin/bash
+
+echo "$1" >> $HOME/.xdg-open.log
+```
+
