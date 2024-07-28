@@ -2,7 +2,7 @@
 local bufnr = vim.api.nvim_get_current_buf()
 vim.keymap.set(
   "n", 
-  "<C-u><C-u>", 
+  "<leader>ii", 
   function()
     vim.cmd.RustLsp('codeAction')
   end,
@@ -11,7 +11,7 @@ vim.keymap.set(
 
 vim.keymap.set(
   "n", 
-  "<C-u>f", 
+  "<leader>if", 
   function()
     vim.cmd.RustFmt()
   end,
