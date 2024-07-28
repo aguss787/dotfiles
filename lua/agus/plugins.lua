@@ -3,6 +3,7 @@ local Plug = vim.fn['plug#']
 
 vim.call('plug#begin')
 
+Plug('tribela/vim-transparent')
 Plug('EdenEast/nightfox.nvim')
 
 Plug('nvim-treesitter/nvim-treesitter', { ['do'] = ':TSUpdate' })
