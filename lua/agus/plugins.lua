@@ -3,18 +3,12 @@ local Plug = vim.fn['plug#']
 
 vim.call('plug#begin')
 
+-- Theme
 Plug('tribela/vim-transparent')
 Plug('EdenEast/nightfox.nvim')
 
-Plug('nvim-treesitter/nvim-treesitter', { ['do'] = ':TSUpdate' })
 Plug('nvim-lua/plenary.nvim')
 Plug('nvim-telescope/telescope.nvim')
-
-Plug('github/copilot.vim')
-
-Plug('mfussenegger/nvim-dap')
-Plug('rust-lang/rust.vim')
-Plug('mrcjkb/rustaceanvim')
 
 Plug('hrsh7th/vim-vsnip')
 Plug('hrsh7th/vim-vsnip-integ')
@@ -61,6 +55,19 @@ Plug('kevinhwang91/nvim-ufo')
 -- Lua-line
 Plug('nvim-lualine/lualine.nvim')
 Plug('nvim-tree/nvim-web-devicons')
+
+-- Language Supports
+-- Generic
+Plug('nvim-treesitter/nvim-treesitter', { ['do'] = ':TSUpdate' })
+Plug('github/copilot.vim')
+
+-- Rust
+Plug('mfussenegger/nvim-dap')
+Plug('rust-lang/rust.vim')
+Plug('mrcjkb/rustaceanvim')
+
+-- Helm
+Plug('towolf/vim-helm')
 
 vim.call('plug#end')
 
