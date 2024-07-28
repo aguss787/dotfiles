@@ -1,6 +1,7 @@
 require('agus.plugins')
 require('agus.theme')
 
+require('agus.setup.transparent')
 require('agus.setup.cmp')
 require('agus.setup.telescope')
 require('agus.setup.lsp_utils')
