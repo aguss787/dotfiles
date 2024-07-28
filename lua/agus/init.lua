@@ -9,6 +9,7 @@ require('agus.setup.rustaceanvim')
 require('agus.setup.nerdtree')
 require('agus.setup.aerial')
 require('agus.setup.ufo')
+require('agus.setup.lualine')
 
 require('agus.functions.xdg-open-log')
 

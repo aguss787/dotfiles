@@ -57,5 +57,9 @@ Plug('iamcco/markdown-preview.nvim', { ['do'] = 'cd app && npx --yes yarn instal
 Plug('kevinhwang91/promise-async')
 Plug('kevinhwang91/nvim-ufo')
 
+-- Lua-line
+Plug('nvim-lualine/lualine.nvim')
+Plug('nvim-tree/nvim-web-devicons')
+
 vim.call('plug#end')
 
