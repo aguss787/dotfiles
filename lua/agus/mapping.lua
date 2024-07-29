@@ -37,6 +37,8 @@ vim.keymap.set('n', 'gr', vim.lsp.buf.references, {})
 vim.keymap.set('n', '<leader>ii', vim.lsp.buf.code_action, {})
 vim.keymap.set('v', '<leader>ii', vim.lsp.buf.code_action, {})
 vim.keymap.set('n', '<leader>ir', vim.lsp.buf.rename, {})
+vim.keymap.set('n', '<leader>iq', vim.diagnostic.setqflist, {})
+vim.keymap.set('n', '<leader>il', vim.diagnostic.setloclist, {})
 
 -- Aerial
 local aerial = require('aerial')
