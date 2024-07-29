@@ -7,6 +7,14 @@ vim.api.nvim_set_keymap('n', '<leader>/', '<cmd>noh<CR>', { noremap = true, sile
 vim.api.nvim_set_keymap('n', '<leader>pp', '<cmd>NERDTreeFocus<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>pc', '<cmd>NERDTreeClose<CR>', { noremap = true, silent = true })
 
+-- Quickfix
+vim.api.nvim_set_keymap('n', '<leader>qq', '<cmd>copen<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>qc', '<cmd>cclose<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>qf', '<cmd>cfirst<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>ql', '<cmd>clast<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>qn', '<cmd>cnext<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>qp', '<cmd>cprev<CR>', { noremap = true, silent = true })
+
 local telescope_builtin = require('telescope.builtin')
 vim.keymap.set('n', '<leader>ff', telescope_builtin.find_files, {})
 vim.keymap.set('n', '<leader>fg', telescope_builtin.live_grep, {})
