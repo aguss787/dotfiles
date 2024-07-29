@@ -5,4 +5,11 @@ require("nvim-tree").setup({
   view = {
     side = "right",
   },
+  actions = {
+    open_file = {
+      window_picker = {
+        enable = false,
+      },
+    },
+  }
 })
