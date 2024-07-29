@@ -30,6 +30,7 @@ Plug('hrsh7th/vim-vsnip')
 
 -- Autopairs
 Plug('windwp/nvim-autopairs')
+Plug('numToStr/Comment.nvim')
 
 -- NeoTest
 Plug('antoinemadec/FixCursorHold.nvim')
