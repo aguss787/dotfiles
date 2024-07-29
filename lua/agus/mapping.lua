@@ -4,8 +4,8 @@ local vim = vim
 vim.api.nvim_set_keymap('n', '<leader>/', '<cmd>noh<CR>', { noremap = true, silent = true })
 
 -- NerdTree
-vim.api.nvim_set_keymap('n', '<leader>p', '<cmd>NERDTreeFocus<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<C-p>', '<cmd>NERDTreeToggle<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>pp', '<cmd>NERDTreeFocus<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>pc', '<cmd>NERDTreeClose<CR>', { noremap = true, silent = true })
 
 local telescrop_builtin = require('telescope.builtin')
 vim.keymap.set('n', '<leader>ff', telescrop_builtin.find_files, {})
@@ -40,8 +40,8 @@ vim.keymap.set('n', '<leader>ir', vim.lsp.buf.rename, {})
 
 -- Aerial
 local aerial = require('aerial')
-vim.keymap.set('n', '<C-a>', aerial.toggle, {})
-vim.keymap.set('n', '<leader>a', aerial.open, {})
+vim.keymap.set('n', '<leader>ac', aerial.close, {})
+vim.keymap.set('n', '<leader>aa', aerial.open, {})
 
 -- UFO
 local ufo = require('ufo')
