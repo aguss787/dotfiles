@@ -11,6 +11,7 @@ require('agus.setup.nvim_tree')
 require('agus.setup.aerial')
 require('agus.setup.ufo')
 require('agus.setup.lualine')
+require('agus.setup.autopairs')
 
 require('agus.functions.xdg-open-log')
 

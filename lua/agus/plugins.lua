@@ -28,6 +28,9 @@ Plug('hrsh7th/nvim-cmp')
 Plug('hrsh7th/cmp-vsnip')
 Plug('hrsh7th/vim-vsnip')
 
+-- Autopairs
+Plug('windwp/nvim-autopairs')
+
 -- NeoTest
 Plug('antoinemadec/FixCursorHold.nvim')
 Plug('nvim-treesitter/nvim-treesitter')
@@ -71,4 +74,7 @@ Plug('mrcjkb/rustaceanvim')
 Plug('towolf/vim-helm')
 
 vim.call('plug#end')
+
+vim.cmd.normal('<cmd>PlugInstall<CR>')
+vim.cmd.normal('<cmd>PlugClean<CR>')
 
