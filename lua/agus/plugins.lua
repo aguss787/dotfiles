@@ -36,6 +36,7 @@ Plug('RishabhRD/popfix')
 Plug('RishabhRD/nvim-lsputils')
 
 -- NerdTree
+Plug('ryanoasis/vim-devicons')
 Plug('preservim/nerdtree')
 Plug('Xuyuanp/nerdtree-git-plugin')
 
