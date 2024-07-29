@@ -17,6 +17,13 @@ vim.o.foldcolumn = '0'
 vim.opt.foldlevel = 99
 vim.opt.foldenable = true
 
+vim.opt.wrap = false
+
+vim.opt.cursorline = true
+
+-- Use the system clipboard
+vim.opt.clipboard:append('unnamedplus')
+
 -- Autoformat on save
 vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
 

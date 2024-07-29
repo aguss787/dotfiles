@@ -1,2 +1,2 @@
-require('agus.init')
+require('agus')
 

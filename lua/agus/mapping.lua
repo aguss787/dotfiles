@@ -1,5 +1,12 @@
 local vim = vim
 
+-- Exit insert mode
+vim.api.nvim_set_keymap('i', 'jk', '<ESC>', { noremap = true, silent = true })
+
+-- Window management
+vim.keymap.set('n', '<leader>sv', '<cmd>vsp<CR>', {})
+vim.keymap.set('n', '<leader>sh', '<cmd>sp<CR>', {})
+
 -- Remove highlight until next searcg
 vim.api.nvim_set_keymap('n', '<leader>/', '<cmd>noh<CR>', { noremap = true, silent = true })
 
