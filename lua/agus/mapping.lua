@@ -10,9 +10,10 @@ vim.keymap.set('n', '<leader>sh', '<cmd>sp<CR>', {})
 -- Remove highlight until next searcg
 vim.api.nvim_set_keymap('n', '<leader>/', '<cmd>noh<CR>', { noremap = true, silent = true })
 
--- NerdTree
-vim.api.nvim_set_keymap('n', '<leader>pp', '<cmd>NERDTreeFocus<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>pc', '<cmd>NERDTreeClose<CR>', { noremap = true, silent = true })
+-- NvimTree
+vim.api.nvim_set_keymap('n', '<leader>pp', '<cmd>NvimTreeFocus<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>pc', '<cmd>NvimTreeClose<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>pf', '<cmd>NvimTreeFindFile<CR>', { noremap = true, silent = true })
 
 -- Quickfix
 vim.api.nvim_set_keymap('n', '<leader>qq', '<cmd>copen<CR>', { noremap = true, silent = true })

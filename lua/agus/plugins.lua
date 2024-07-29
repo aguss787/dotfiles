@@ -7,6 +7,9 @@ vim.call('plug#begin')
 Plug('tribela/vim-transparent')
 Plug('EdenEast/nightfox.nvim')
 
+-- Devicons
+Plug('nvim-tree/nvim-web-devicons')
+
 Plug('nvim-lua/plenary.nvim')
 Plug('nvim-telescope/telescope.nvim')
 
@@ -35,10 +38,8 @@ Plug('nvim-neotest/neotest')
 Plug('RishabhRD/popfix')
 Plug('RishabhRD/nvim-lsputils')
 
--- NerdTree
-Plug('ryanoasis/vim-devicons')
-Plug('preservim/nerdtree')
-Plug('Xuyuanp/nerdtree-git-plugin')
+-- NvimTree
+Plug('nvim-tree/nvim-tree.lua')
 
 -- Tmux integration
 Plug('christoomey/vim-tmux-navigator')
@@ -55,7 +56,6 @@ Plug('kevinhwang91/nvim-ufo')
 
 -- Lua-line
 Plug('nvim-lualine/lualine.nvim')
-Plug('nvim-tree/nvim-web-devicons')
 
 -- Language Supports
 -- Generic

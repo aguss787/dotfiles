@@ -1,2 +1,2 @@
-vim.g.transparent_groups_add = { 'NormalFloat' }
+vim.g.transparent_groups_add = { 'NormalFloat', 'NvimTreeNormal' }
 
