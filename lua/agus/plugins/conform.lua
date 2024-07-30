@@ -2,6 +2,8 @@ return {
 	"stevearc/conform.nvim",
 	opts = {
 		formatters_by_ft = {
+			yaml = { "prettier" },
+			json = { "prettier" },
 			lua = { "stylua" },
 			rust = { "rustfmt", lsp_format = "fallback" },
 		},
