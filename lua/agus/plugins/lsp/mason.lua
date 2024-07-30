@@ -1,4 +1,8 @@
 return {
-    "williamboman/mason.nvim",
-    opts = {},
+	"williamboman/mason.nvim",
+	opts = {
+		ui = {
+			border = "rounded",
+		},
+	},
 }
