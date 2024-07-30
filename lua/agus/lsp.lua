@@ -16,9 +16,22 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		)
 		vim.keymap.set("n", "gr", "<cmd>Telescope lsp_references<CR>", { buffer = ev.buf, desc = "Go to references" })
 
-		vim.keymap.set("n", "<leader>ii", vim.lsp.buf.code_action, { buffer = ev.buf, desc = "Code action" })
-		vim.keymap.set("v", "<leader>ii", vim.lsp.buf.code_action, { buffer = ev.buf, desc = "Code action" })
-		vim.keymap.set("n", "<leader>ir", vim.lsp.buf.rename, { buffer = ev.buf, desc = "Rename" })
+		-- don't map if the key is already set
+		if vim.fn.maparg("<leader>ii", "n") == "" then
+			vim.keymap.set("n", "<leader>ii", vim.lsp.buf.code_action, { buffer = ev.buf, desc = "Code action" })
+		end
+
+		if vim.fn.maparg("<leader>ii", "v") == "" then
+			vim.keymap.set("v", "<leader>ii", vim.lsp.buf.code_action, { buffer = ev.buf, desc = "Code action" })
+		end
+
+		if vim.fn.maparg("<leader>ir", "n") == "" then
+			vim.keymap.set("n", "<leader>ir", vim.lsp.buf.rename, { buffer = ev.buf, desc = "Format code" })
+		end
+
+		if vim.fn.maparg("<leader>if", "n") == "" then
+			vim.keymap.set("n", "<leader>if", vim.lsp.buf.format, { buffer = ev.buf, desc = "Format code" })
+		end
 
 		-- diagnostics
 		vim.keymap.set(
