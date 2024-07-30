@@ -20,5 +20,12 @@ return {
 			end,
 			desc = "Save session",
 		},
+		{
+			"<leader>sd",
+			function()
+				vim.cmd("SessionDelete")
+			end,
+			desc = "Delete session",
+		},
 	},
 }
