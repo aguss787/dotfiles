@@ -30,7 +30,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		end
 
 		if vim.fn.maparg("<leader>if", "n") == "" then
-			vim.keymap.set("n", "<leader>if", vim.lsp.buf.format, { buffer = ev.buf, desc = "Format code" })
+			vim.keymap.set("n", "<leader>if", require("conform").format, { buffer = ev.buf, desc = "Format code" })
 		end
 
 		-- diagnostics
