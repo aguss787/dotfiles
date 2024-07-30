@@ -1,2 +1,1 @@
-require('agus')
-
+require("agus")
