@@ -20,6 +20,7 @@ require("lazy").setup({
   spec = {
     -- import your plugins
     { import = "agus.plugins" },
+    { import = "agus.plugins.lsp" },
   },
   -- automatically check for plugin updates
   checker = { 
