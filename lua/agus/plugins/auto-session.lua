@@ -4,12 +4,21 @@ return {
 	dependencies = {
 		"nvim-telescope/telescope.nvim", -- Only needed if you want to use sesssion lens
 	},
-
-	config = function()
-		local session = require("auto-session")
-		session.setup({})
-
-		vim.keymap.set("n", "<leader>sr", "<cmd>SessionRestore<CR>", { desc = "Restore session" })
-		vim.keymap.set("n", "<leader>ss", "<cmd>SessionSave<CR>", { desc = "Save session" })
-	end,
+	opts = {},
+	keys = {
+		{
+			"<leader>sr",
+			function()
+				vim.cmd("SessionRestore")
+			end,
+			desc = "Restore session",
+		},
+		{
+			"<leader>ss",
+			function()
+				vim.cmd("SessionSave")
+			end,
+			desc = "Save session",
+		},
+	},
 }

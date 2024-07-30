@@ -1,3 +1,3 @@
 return {
-  'github/copilot.vim'
+	"mhinz/vim-signify",
 }
