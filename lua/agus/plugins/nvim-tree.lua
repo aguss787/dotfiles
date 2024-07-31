@@ -30,7 +30,9 @@ return {
 		{
 			"<leader>pf",
 			function()
-				require("nvim-tree.api").tree.find_file()
+				require("nvim-tree.api").tree.open({
+					find_file = true,
+				})
 				require("nvim-tree.api").tree.focus()
 			end,
 			desc = "Find File in Project Tree",
