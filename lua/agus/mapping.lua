@@ -1,5 +1,5 @@
 -- Terminal mode mapping
-vim.keymap.set("t", "<ESC>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+vim.keymap.set("t", "<C-t>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
 -- Exit insert mode
 vim.keymap.set("i", "jk", "<ESC>", { desc = "Exit insert mode" })
