@@ -7,6 +7,8 @@ return {
 		ensure_installed = {
 			"stylua",
 			"prettier",
+			"mypy",
+			"black",
 		},
 	},
 }

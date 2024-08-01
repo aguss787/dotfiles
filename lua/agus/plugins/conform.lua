@@ -6,6 +6,7 @@ return {
 			json = { "prettier" },
 			lua = { "stylua" },
 			rust = { "rustfmt", lsp_format = "fallback" },
+			python = { "black" },
 		},
 		format_on_save = {
 			lsp_fallback = true,
