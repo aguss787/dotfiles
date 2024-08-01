@@ -11,3 +11,7 @@ end, { buffer = bufnr, desc = "Code action" })
 vim.keymap.set("n", "<leader>if", function()
 	vim.cmd.RustFmt()
 end, { buffer = bufnr, desc = "Format code" })
+
+vim.keymap.set("n", "<leader>or", function()
+	vim.cmd.RustLsp("debuggables")
+end, { buffer = bufnr, desc = "Rename" })
