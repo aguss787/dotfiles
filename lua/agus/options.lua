@@ -24,3 +24,11 @@ vim.opt.cursorline = true
 
 -- Use the system clipboard
 vim.opt.clipboard:append("unnamedplus")
+
+vim.diagnostic.config({
+	virtual_text = true,
+})
+
+-- Show line diagnostics automatically in hover window
+vim.o.updatetime = 1000
+vim.cmd([[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})]])
