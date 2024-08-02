@@ -8,6 +8,7 @@ return {
 			rust = { "rustfmt", lsp_format = "fallback" },
 			python = { "black" },
 			sh = { "beautysh" },
+			elm = { "elm-format" },
 		},
 		format_on_save = {
 			lsp_fallback = true,

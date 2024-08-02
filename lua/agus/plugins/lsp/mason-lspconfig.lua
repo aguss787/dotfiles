@@ -12,6 +12,7 @@ return {
 			"gopls",
 			"pyright",
 			"bashls",
+			"elmls",
 		},
 		handlers = {
 			function(server_name)

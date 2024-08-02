@@ -10,6 +10,7 @@ return {
 			"mypy",
 			"black",
 			"beautysh",
+			"elm-format",
 		},
 	},
 }
