@@ -18,12 +18,6 @@ return {
 					capabilities = require("cmp_nvim_lsp").default_capabilities(),
 				})
 			end,
-			["pyright"] = function()
-				require("lspconfig").pyright.setup({
-					capabilities = require("cmp_nvim_lsp").default_capabilities(),
-					filetypes = { "python" },
-				})
-			end,
 			["yamlls"] = function()
 				local capabilities = require("cmp_nvim_lsp").default_capabilities()
 				capabilities.textDocument.foldingRange = {
