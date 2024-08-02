@@ -7,6 +7,7 @@ return {
 			lua = { "stylua" },
 			rust = { "rustfmt", lsp_format = "fallback" },
 			python = { "black" },
+			sh = { "beautysh" },
 		},
 		format_on_save = {
 			lsp_fallback = true,
