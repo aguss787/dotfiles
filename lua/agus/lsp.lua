@@ -32,21 +32,5 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		if vim.fn.maparg("<leader>if", "n") == "" then
 			vim.keymap.set("n", "<leader>if", require("conform").format, { buffer = ev.buf, desc = "Format code" })
 		end
-
-		-- diagnostics
-		vim.keymap.set(
-			"n",
-			"<leader>dq",
-			vim.diagnostic.setqflist,
-			{ buffer = ev.buf, desc = "Set quickfix list from diagnostics" }
-		)
-		vim.keymap.set(
-			"n",
-			"<leader>dl",
-			vim.diagnostic.setloclist,
-			{ buffer = ev.buf, desc = "Set location list from diagnostics" }
-		)
-		vim.keymap.set("n", "<leader>dn", vim.diagnostic.goto_next, { buffer = ev.buf, desc = "Go to next diagnostic" })
-		vim.keymap.set("n", "<leader>dp", vim.diagnostic.goto_next, { buffer = ev.buf, desc = "Go to next diagnostic" })
 	end,
 })
