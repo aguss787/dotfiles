@@ -1,36 +1,48 @@
 return {
 	"folke/trouble.nvim",
-	opts = {}, -- for default options, refer to the configuration section for custom setup.
+	opts = {
+		open_no_results = true,
+		modes = {
+			important_diagnostics = {
+				mode = "diagnostics",
+				filter = function(items)
+					return vim.tbl_filter(function(item)
+						return item.severity ~= vim.diagnostic.severity.HINT
+					end, items)
+				end,
+			},
+		},
+	},
 	cmd = "Trouble",
 	keys = {
 		{
 			"<leader>dd",
-			"<cmd>Trouble diagnostics toggle<cr>",
+			"<cmd>Trouble important_diagnostics toggle<cr>",
 			desc = "Diagnostics (Trouble)",
 		},
 		{
 			"<leader>dD",
-			"<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
+			"<cmd>Trouble important_diagnostics toggle filter.buf=0<cr>",
 			desc = "Buffer Diagnostics (Trouble)",
 		},
 		{
 			"<leader>dn",
-			"<cmd>Trouble diagnostics next focus=true<cr>",
+			"<cmd>Trouble important_diagnostics next jump=true<cr>",
 			desc = "Next (Trouble)",
 		},
 		{
 			"<leader>dp",
-			"<cmd>Trouble diagnostics prev focus=true<cr>",
+			"<cmd>Trouble important_diagnostics prev jump=true<cr>",
 			desc = "Previous (Trouble)",
 		},
 		{
 			"<leader>df",
-			"<cmd>Trouble diagnostics first focus=true<cr>",
+			"<cmd>Trouble important_diagnostics first jump=true<cr>",
 			desc = "First (Trouble)",
 		},
 		{
 			"<leader>dl",
-			"<cmd>Trouble diagnostics last focus=true<cr>",
+			"<cmd>Trouble important_diagnostics last jump=true<cr>",
 			desc = "Last (Trouble)",
 		},
 	},
