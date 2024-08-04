@@ -4,6 +4,13 @@ vim.keymap.set("t", "<C-t>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 -- Exit insert mode
 vim.keymap.set("i", "jk", "<ESC>", { desc = "Exit insert mode" })
 
+-- Move line up and down
+vim.keymap.set("v", "<C-Up>", ":m '<-2<CR>gv=gv", { desc = "Move line up" })
+vim.keymap.set("v", "<C-Down>", ":m '>+1<CR>gv=gv", { desc = "Move line down" })
+
+vim.keymap.set("n", "<C-Up>", "<cmd>m .-2<CR>", { desc = "Move line up" })
+vim.keymap.set("n", "<C-Down>", "<cmd>m .+1<CR>", { desc = "Move line down" })
+
 -- Window management
 vim.keymap.set("n", "<leader>we", "<C-w>=", { desc = "Equalize windows" })
 vim.keymap.set("n", "<leader>wj", "<C-w>-", { desc = "Decrease window height" })
