@@ -9,6 +9,7 @@ return {
 			python = { "black" },
 			sh = { "beautysh" },
 			elm = { "elm-format" },
+			markdown = { "prettier" },
 		},
 		format_on_save = {
 			lsp_fallback = true,
