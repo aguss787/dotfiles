@@ -19,6 +19,10 @@ return {
 			diagnostics_trigger_update = true,
 		},
 
+		manage_folds = true,
+		link_folds_to_tree = false,
+		link_tree_to_folds = true,
+
 		autojump = true,
 		keymaps = {
 			["o"] = "actions.jump",
