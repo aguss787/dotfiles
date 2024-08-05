@@ -7,6 +7,12 @@ return {
 		---@diagnostic disable-next-line: missing-fields
 		configs.setup({
 			ensure_installed = {
+				-- For markview
+				"markdown",
+				"markdown_inline",
+				"html",
+
+				-- Other
 				"rust",
 				"lua",
 				"yaml",
