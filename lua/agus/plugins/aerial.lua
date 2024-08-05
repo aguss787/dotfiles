@@ -10,6 +10,7 @@ return {
 
 		attach_mode = "global",
 		layout = {
+			max_width = 0.2,
 			default_direction = "left",
 			placement = "edge",
 		},
