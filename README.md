@@ -28,13 +28,6 @@ git clone https://github.com/aguss787/nvim-config.git ~/.config/nvim
 
 Open NeoVim and install the plugins using `:Lazy`. The installation should run automatically.
 
-### TreeSitter Setup
-
-TreeSitter parsers is not handled in the config. This is choosen because it is not necessary to
-install all the parsers for all the languages. You can install the parsers you need. Please refer to
-[TreeSitter GitHub Page](https://github.com/nvim-treesitter/nvim-treesitter) on how to install the
-parsers.
-
 ## Updating the config
 
 To update the config, pull the latest changes from this repo.
