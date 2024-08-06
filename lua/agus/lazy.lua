@@ -21,6 +21,7 @@ require("lazy").setup({
 		-- import your plugins
 		{ import = "agus.plugins" },
 		{ import = "agus.plugins.lsp" },
+		{ import = "agus.plugins.copilot" },
 	},
 	ui = {
 		border = "rounded",

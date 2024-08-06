@@ -8,6 +8,7 @@ return {
 		"hrsh7th/cmp-cmdline",
 		"hrsh7th/cmp-vsnip",
 		"hrsh7th/vim-vsnip",
+		"zbirenbaum/copilot-cmp",
 	},
 	config = function()
 		local cmp = require("cmp")
@@ -35,6 +36,7 @@ return {
 				["<CR>"] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
 			}),
 			sources = cmp.config.sources({
+				{ name = "copilot", group_index = 2 },
 				{ name = "nvim_lsp" },
 				{ name = "vsnip" }, -- For vsnip users.
 				-- { name = 'luasnip' }, -- For luasnip users.
