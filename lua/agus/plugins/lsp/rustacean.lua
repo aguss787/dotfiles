@@ -5,7 +5,9 @@ return {
 	config = function()
 		vim.g.rustaceanvim = {
 			-- Plugin configuration
-			tools = {},
+			tools = {
+				enable_nextest = true,
+			},
 			-- LSP configuration
 			server = {
 				default_settings = {
