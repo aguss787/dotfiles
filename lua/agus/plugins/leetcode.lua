@@ -42,6 +42,31 @@ return {
 				home = storage(lang),
 			},
 
+			hooks = {
+				["question_enter"] = {
+					function(question)
+						local file = question.file
+						local file_path = question.file:absolute()
+						local parent = file:parent()
+						local parent_path = parent:absolute()
+
+						local file_name = string.sub(file_path, parent_path:len() + 2)
+						local new_file_name = file_name:gsub("^(%d+).", "%1_")
+
+						local new_file_path = parent:joinpath(new_file_name)
+
+						if not new_file_path:exists() then
+							file:rename({
+								new_name = new_file_path:absolute(),
+							})
+						end
+
+						file:rm()
+						os.execute("ln -s " .. new_file_path .. " " .. file_path)
+					end,
+				},
+			},
+
 			keys = {
 				toggle = { "q" },
 				confirm = { "<CR>" },
