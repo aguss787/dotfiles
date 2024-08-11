@@ -26,7 +26,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		end
 
 		if vim.fn.maparg("<leader>ir", "n") == "" then
-			vim.keymap.set("n", "<leader>ir", vim.lsp.buf.rename, { buffer = ev.buf, desc = "Format code" })
+			vim.keymap.set("n", "<leader>ir", function()
+				return ":IncRename " .. vim.fn.expand("<cword>")
+			end, { expr = true, desc = "Rename" })
+			-- vim.keymap.set("n", "<leader>ir", vim.lsp.buf.rename, { buffer = ev.buf, desc = "Rename" })
 		end
 
 		if vim.fn.maparg("<leader>if", "n") == "" then
