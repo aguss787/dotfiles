@@ -18,11 +18,21 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
 		-- don't map if the key is already set
 		if vim.fn.maparg("<leader>ii", "n") == "" then
-			vim.keymap.set("n", "<leader>ii", vim.lsp.buf.code_action, { buffer = ev.buf, desc = "Code action" })
+			vim.keymap.set(
+				"n",
+				"<leader>ii",
+				require("actions-preview").code_actions,
+				{ buffer = ev.buf, desc = "Code action" }
+			)
 		end
 
 		if vim.fn.maparg("<leader>ii", "v") == "" then
-			vim.keymap.set("v", "<leader>ii", vim.lsp.buf.code_action, { buffer = ev.buf, desc = "Code action" })
+			vim.keymap.set(
+				"v",
+				"<leader>ii",
+				require("actions-preview").code_actions,
+				{ buffer = ev.buf, desc = "Code action" }
+			)
 		end
 
 		if vim.fn.maparg("<leader>ir", "n") == "" then

@@ -16,6 +16,10 @@ return {
 						vim.cmd.RustLsp("codeAction")
 					end, { buffer = bufnr, desc = "Code action" })
 
+					vim.keymap.set("v", "<leader>ii", function()
+						vim.cmd.RustLsp("codeAction")
+					end, { buffer = bufnr, desc = "Code action" })
+
 					vim.keymap.set("n", "<leader>if", function()
 						vim.cmd.RustFmt()
 					end, { buffer = bufnr, desc = "Format code" })
@@ -25,9 +29,9 @@ return {
 					end, { buffer = bufnr, desc = "Debug" })
 				end,
 				default_settings = {
-					-- rust-analyzer language server configuration
+					-- Rust-analyzer language server configuration
 					["rust-analyzer"] = {
-						-- disable clippy
+						-- Disable clippy
 						checkOnSave = {
 							command = "check",
 						},
