@@ -13,6 +13,7 @@ return {
 			"pyright",
 			"bashls",
 			"elmls",
+			"harper_ls",
 		},
 		handlers = {
 			function(server_name)

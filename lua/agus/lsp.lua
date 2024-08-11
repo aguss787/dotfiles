@@ -29,11 +29,23 @@ vim.api.nvim_create_autocmd("LspAttach", {
 			vim.keymap.set("n", "<leader>ir", function()
 				return ":IncRename " .. vim.fn.expand("<cword>")
 			end, { expr = true, desc = "Rename" })
-			-- vim.keymap.set("n", "<leader>ir", vim.lsp.buf.rename, { buffer = ev.buf, desc = "Rename" })
 		end
 
 		if vim.fn.maparg("<leader>if", "n") == "" then
 			vim.keymap.set("n", "<leader>if", require("conform").format, { buffer = ev.buf, desc = "Format code" })
+		end
+
+		-- Enable these mappings if the filetupe is markdown
+		if vim.bo.filetype == "markdown" then
+			vim.keymap.set("n", "<leader>mp", function()
+				vim.cmd("MarkdownPreview")
+				print("Markdown preview started")
+			end, { buffer = ev.buf, desc = "Start markdown preview" })
+
+			vim.keymap.set("n", "<leader>ms", function()
+				vim.cmd("MarkdownPreviewStop")
+				print("Markdown preview stopped")
+			end, { buffer = ev.buf, desc = "Stop markdown preview" })
 		end
 	end,
 })
