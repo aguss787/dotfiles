@@ -16,6 +16,11 @@ return {
 	cmd = "Trouble",
 	keys = {
 		{
+			"<leader>da",
+			"<cmd>Trouble diagnostics toggle<cr>",
+			desc = "Diagnostics - All (Trouble)",
+		},
+		{
 			"<leader>dd",
 			"<cmd>Trouble important_diagnostics toggle<cr>",
 			desc = "Diagnostics (Trouble)",

@@ -23,6 +23,9 @@ vim.opt.wrap = false
 vim.opt.textwidth = 100
 vim.opt.colorcolumn = "+1"
 
+vim.opt.splitright = true
+vim.opt.splitbelow = true
+
 vim.opt.cursorline = true
 
 -- Use the system clipboard
