@@ -31,7 +31,7 @@ return {
 
 			injector = {
 				["rust"] = {
-					before = { "#![allow(dead_code)]", "struct Solution;" },
+					before = { "#![allow(dead_code, unused_variables)]", "struct Solution;" },
 					after = { "fn main() {}" },
 				},
 			},
