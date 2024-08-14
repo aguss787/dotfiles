@@ -20,9 +20,7 @@ Use your package manager to install node, npm, and yarn. I believe in you. :)
 
 ### Clone this repo
 
-```bash
-git clone https://github.com/aguss787/nvim-config.git ~/.config/nvim
-```
+Follow the instruction in the top level README on how to setup this dotfile.
 
 ### Install plugins
 
@@ -30,14 +28,8 @@ Open NeoVim and install the plugins using `:Lazy`. The installation should run a
 
 ## Updating the config
 
-To update the config, pull the latest changes from this repo.
-
-```bash
-cd ~/.config/nvim
-git pull
-```
-
-LazyVim will install the new plugins automatically.
+To update the config, pull the latest changes from this repo. LazyVim will install the new plugins
+automatically.
 
 ## Trouble Shooting
 
