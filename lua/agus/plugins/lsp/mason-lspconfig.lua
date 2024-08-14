@@ -14,6 +14,7 @@ return {
 			"bashls",
 			"elmls",
 			"harper_ls",
+			"clangd",
 		},
 		handlers = {
 			function(server_name)

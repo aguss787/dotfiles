@@ -10,6 +10,7 @@ return {
 			sh = { "beautysh" },
 			elm = { "elm-format" },
 			markdown = { "prettier" },
+			c = { "clang-format" },
 		},
 		format_on_save = {
 			lsp_fallback = true,

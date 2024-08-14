@@ -11,6 +11,7 @@ return {
 			"black",
 			"beautysh",
 			"elm-format",
+			"clang-format",
 		},
 	},
 }
