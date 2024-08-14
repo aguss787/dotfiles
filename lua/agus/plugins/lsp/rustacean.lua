@@ -12,11 +12,11 @@ return {
 			server = {
 				---@diagnostic disable-next-line: unused-local
 				on_attach = function(client, bufnr)
-					vim.keymap.set("n", "<leader>ii", function()
+					vim.keymap.set("n", "<leader>il", function()
 						vim.cmd.RustLsp("codeAction")
 					end, { buffer = bufnr, desc = "Code action" })
 
-					vim.keymap.set("v", "<leader>ii", function()
+					vim.keymap.set("v", "<leader>il", function()
 						vim.cmd.RustLsp("codeAction")
 					end, { buffer = bufnr, desc = "Code action" })
 
