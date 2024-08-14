@@ -1,6 +1,6 @@
 all: nvim-config tmux-config zshrc
 
-nvim-config:
+nvim-config: lazygit-config
 	@echo "Setting up nvim..."
 	ln -s $(shell pwd)/nvim ~/.config/nvim
 
@@ -12,11 +12,16 @@ zshrc:
 	@echo "Setting up zsh..."
 	ln -s $(shell pwd)/zsh/.zshrc ~/.zshrc
 
+lazygit-config:
+	@echo "Setting up lazygit..."
+	ln -s $(shell pwd)/lazygit ~/.config/lazygit
+
 clean:
 	@echo "Cleaning up..."
-	rm -f ~/.config/nvim
-	rm -f ~/.tmux.conf
-	rm -f ~/.zshrc
+	rm -rf ~/.config/nvim
+	rm -rf ~/.tmux.conf
+	rm -rf ~/.zshrc
+	rm -rf ~/.config/lazygit
 
 timestamp = $(shell date +%s)
 
@@ -26,3 +31,4 @@ backup:
 	cp -R ~/.config/nvim ~/.dotfiles/backup/$(timestamp)
 	cp -R ~/.tmux.conf ~/.dotfiles/backup/$(timestamp)
 	cp -R ~/.zshrc ~/.dotfiles/backup/$(timestamp)
+	cp -R ~/.config/lazygit ~/.dotfiles/backup/$(timestamp)
