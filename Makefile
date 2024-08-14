@@ -12,3 +12,11 @@ clean:
 	@echo "Cleaning up..."
 	rm ~/.config/nvim
 	rm ~/.tmux.conf
+
+timestamp = $(shell date +%s)
+
+backup:
+	@echo "Backing up to ~/.dotfiles/backup/$(timestamp)"
+	mkdir -p ~/.dotfiles/backup/$(timestamp)
+	cp -R ~/.config/nvim ~/.dotfiles/backup/$(timestamp)
+	cp -R ~/.tmux.conf ~/.dotfiles/backup/$(timestamp)
