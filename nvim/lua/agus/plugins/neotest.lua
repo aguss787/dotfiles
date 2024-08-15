@@ -1,3 +1,5 @@
+---@diagnostic disable: missing-fields
+
 return {
 	"nvim-neotest/neotest",
 	dependencies = {
@@ -6,14 +8,16 @@ return {
 		"antoinemadec/FixCursorHold.nvim",
 		"nvim-treesitter/nvim-treesitter",
 
-		-- neotest adapters
+		-- Neotest adapters
 		"mrcjkb/rustaceanvim",
+		"fredrikaverpil/neotest-golang",
 	},
-	-- We cannot use opts becuase we need to load the adapter
+	-- We cannot use opts because we need to load the adapter
 	config = function()
 		require("neotest").setup({
 			adapters = {
 				require("rustaceanvim.neotest"),
+				require("neotest-golang"),
 			},
 			summary = {
 				mappings = {

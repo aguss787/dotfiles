@@ -22,6 +22,26 @@ return {
 					capabilities = require("cmp_nvim_lsp").default_capabilities(),
 				})
 			end,
+			["gopls"] = function()
+				local capabilities = require("cmp_nvim_lsp").default_capabilities()
+
+				require("lspconfig").gopls.setup({
+					capabilities = capabilities,
+					settings = {
+						gopls = {
+							hints = {
+								assignVariableTypes = true,
+								compositeLiteralFields = true,
+								compositeLiteralTypes = true,
+								constantValues = true,
+								functionTypeParameters = true,
+								parameterNames = true,
+								rangeVariableTypes = true,
+							},
+						},
+					},
+				})
+			end,
 			["yamlls"] = function()
 				local capabilities = require("cmp_nvim_lsp").default_capabilities()
 				capabilities.textDocument.foldingRange = {
