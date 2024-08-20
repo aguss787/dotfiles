@@ -28,6 +28,13 @@ return {
 	end,
 	keys = {
 		{
+			"tS",
+			function()
+				require("neotest").run.stop()
+			end,
+			desc = "Stop test",
+		},
+		{
 			"tt",
 			function()
 				require("neotest").run.run()
