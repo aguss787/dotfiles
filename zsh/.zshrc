@@ -126,3 +126,5 @@ if [ -n "$WITHTMUX" ] && [ -z "$TMUX" ]; then
 	exec $(tmux attach -t $WITHTMUX || tmux new -s $WITHTMUX)
 fi
 
+source ~/.zsh/catppuccin_mocha-zsh-syntax-highlighting.zsh
+
