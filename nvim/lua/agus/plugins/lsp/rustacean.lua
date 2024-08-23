@@ -35,6 +35,9 @@ return {
 						checkOnSave = {
 							command = "check",
 						},
+						inlayHints = {
+							maxLength = 5,
+						},
 					},
 				},
 			},
