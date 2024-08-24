@@ -11,6 +11,10 @@ return {
 			elm = { "elm-format" },
 			markdown = { "prettier" },
 			c = { "clang-format" },
+
+			-- TS/React
+			typescript = { "prettier" },
+			typescriptreact = { "prettier" },
 		},
 		format_on_save = {
 			lsp_fallback = true,
