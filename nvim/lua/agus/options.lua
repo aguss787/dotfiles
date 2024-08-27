@@ -28,6 +28,9 @@ vim.opt.splitbelow = true
 
 vim.opt.cursorline = true
 
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
+
 -- Use the system clipboard
 vim.opt.clipboard:append("unnamedplus")
 
