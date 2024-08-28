@@ -36,7 +36,7 @@ return {
 							command = "check",
 						},
 						inlayHints = {
-							maxLength = 5,
+							maxLength = 100,
 						},
 					},
 				},
