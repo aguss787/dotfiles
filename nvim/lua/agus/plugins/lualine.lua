@@ -8,7 +8,7 @@ return {
 		theme = "catppuccin",
 		sections = {
 			lualine_x = { "copilot", "encoding", "fileformat", "filetype" },
-			lualine_c = { "macro_recording", "%S" },
+			lualine_c = { "filename", "macro_recording" },
 		},
 	},
 }
