@@ -13,7 +13,6 @@ return {
 			"pyright",
 			"bashls",
 			"elmls",
-			"harper_ls",
 			"clangd",
 		},
 		handlers = {
