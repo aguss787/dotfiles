@@ -21,6 +21,44 @@ return {
 					capabilities = require("cmp_nvim_lsp").default_capabilities(),
 				})
 			end,
+			["cucumber_language_server"] = function()
+				local capabilities = require("cmp_nvim_lsp").default_capabilities()
+
+				require("lspconfig").cucumber_language_server.setup({
+					capabilities = capabilities,
+					settings = {
+						cucumber = {
+							glue = {
+								-- Cucumber-JVM
+								"src/test/**/*.java",
+								-- Cucumber-Js
+								"features/**/*.ts",
+								"features/**/*.tsx",
+								"features/**/*.js",
+								"features/**/*.jsx",
+								-- Behat
+								"features/**/*.php",
+								-- Behave
+								"features/**/*.py",
+								-- Pytest-BDD
+								"tests/**/*.py",
+								-- Cucumber Rust
+								"tests/**/*.rs",
+								"features/**/*.rs",
+								-- Cucumber-Ruby
+								"features/**/*.rb",
+								-- SpecFlow
+								"*specs*/**/*.cs",
+								-- Godog
+								"features/**/*_test.go",
+
+								-- Custom
+								"**/test.rs",
+							},
+						},
+					},
+				})
+			end,
 			["gopls"] = function()
 				local capabilities = require("cmp_nvim_lsp").default_capabilities()
 

@@ -11,6 +11,7 @@ return {
 			elm = { "elm-format" },
 			markdown = { "prettier" },
 			c = { "clang-format" },
+			cucumber = { "reformat-gherkin" },
 
 			-- TS/React
 			typescript = { "prettier" },
