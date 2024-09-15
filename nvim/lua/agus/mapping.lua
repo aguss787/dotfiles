@@ -20,7 +20,7 @@ vim.keymap.set("n", "<leader>wl", "<C-w>>", { desc = "Decrease window height" })
 
 -- Split management
 vim.keymap.set("n", "<leader>sv", "<cmd>vsp<CR>", { desc = "Split vertically" })
-vim.keymap.set("n", "<leader>sh", "<cmd>sp<CR>", { desc = "Split horizontally" })
+vim.keymap.set("n", "<leader>sV", "<cmd>sp<CR>", { desc = "Split horizontally" })
 
 -- Remove highlight until next searcg
 vim.keymap.set("n", "<leader>/", "<cmd>noh<CR>", { desc = "Remove highlight until next search" })
