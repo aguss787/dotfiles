@@ -4,7 +4,7 @@ return {
 		formatters_by_ft = {
 			yaml = { "prettier" },
 			json = { "prettier" },
-			lua = { "stylua" },
+			lua = { "luaformatter" },
 			rust = { "rustfmt", lsp_format = "fallback" },
 			python = { "black" },
 			sh = { "beautysh" },
