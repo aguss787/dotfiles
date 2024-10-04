@@ -114,6 +114,7 @@ alias rkube="rancher kubectl"
 alias vim="nvim"
 alias cd="z"
 
+export GPG_TTY=$(tty)
 export KUBE_EDITOR="nvim"
 export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/ssh-agent.socket"
 
