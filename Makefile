@@ -16,6 +16,10 @@ lazygit-config:
 	@echo "Setting up lazygit..."
 	ln -s $(shell pwd)/lazygit ~/.config/lazygit
 
+gnupg-config:
+	@echo "Setting up gnupg..."
+	ln -s $(shell pwd)/gnupg/gpg.conf ~/.gnupg/gpg.conf
+
 clean:
 	@echo "Cleaning up..."
 	rm -rf ~/.config/nvim
@@ -32,3 +36,4 @@ backup:
 	cp -R ~/.tmux.conf ~/.dotfiles/backup/$(timestamp)
 	cp -R ~/.zshrc ~/.dotfiles/backup/$(timestamp)
 	cp -R ~/.config/lazygit ~/.dotfiles/backup/$(timestamp)
+	cp -R ~/.gnupg/gpg.conf ~/.dotfiles/backup/$(timestamp)
