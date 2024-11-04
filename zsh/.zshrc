@@ -129,3 +129,11 @@ fi
 
 source ~/.zsh/catppuccin_mocha-zsh-syntax-highlighting.zsh
 
+# Add deno completions to search path
+if [[ ":$FPATH:" != *":/home/$USER/.zsh/completions:"* ]]; then export FPATH="/home/$USER/.zsh/completions:$FPATH"; fi
+
+. "/home/$USER/.deno/env"
+
+# Initialize zsh completions (added by deno install script)
+autoload -Uz compinit
+compinit
