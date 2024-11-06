@@ -1,4 +1,5 @@
-all: nvim-config tmux-config zshrc
+all: nvim-config tmux-config zshrc rofi-config lazygit-config gnupg-config
+server: nvim-config tmux-config zshrc gnupg-config
 
 nvim-config: lazygit-config
 	@echo "Setting up nvim..."
@@ -11,6 +12,10 @@ tmux-config:
 zshrc:
 	@echo "Setting up zsh..."
 	ln -s $(shell pwd)/zsh/.zshrc ~/.zshrc
+
+rofi-config:
+	@echo "Setting up rofi..."
+	ln -s $(shell pwd)/rofi ~/.config/rofi
 
 lazygit-config:
 	@echo "Setting up lazygit..."

@@ -1,0 +1,10 @@
+configuration {
+ modi: "window,drun,ssh,combi";
+ font: "consolas 10";
+ combi-modi: "window,drun,ssh";
+ terminal: "wezterm";
+}
+
+//@theme "DarkBlue"
+
+@theme "/usr/share/rofi/themes/DarkBlue.rasi"
