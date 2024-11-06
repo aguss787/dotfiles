@@ -35,6 +35,9 @@ clean:
 	rm -rf ~/.tmux.conf
 	rm -rf ~/.zshrc
 	rm -rf ~/.config/lazygit
+	rm -rf ~/.gnupg/gpg.conf
+	rm -rf ~/.wezterm.lua
+	rm -rf ~/.config/rofi
 
 timestamp = $(shell date +%s)
 
@@ -46,3 +49,5 @@ backup:
 	cp -R ~/.zshrc ~/.dotfiles/backup/$(timestamp)
 	cp -R ~/.config/lazygit ~/.dotfiles/backup/$(timestamp)
 	cp -R ~/.gnupg/gpg.conf ~/.dotfiles/backup/$(timestamp)
+	cp -R ~/.wezterm.lua ~/.dotfiles/backup/$(timestamp)
+	cp -R ~/.config/rofi ~/.dotfiles/backup/$(timestamp)
