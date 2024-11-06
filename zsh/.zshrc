@@ -123,8 +123,13 @@ export GPG_TTY=$(tty)
 export KUBE_EDITOR="nvim"
 export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/ssh-agent.socket"
 
-eval "$(zoxide init zsh)"
-eval "$(fzf --zsh)"
+if [ -x "$(command -v zoxide)" ]; then
+  eval "$(zoxide init zsh)"
+fi
+
+if [ -x "$(command -v fzf)" ]; then
+  eval "$(fzf --zsh)"
+fi
 
 # Enter tmux session if WITHTMUX env is set and $TMUX is not set
 if [ -n "$WITHTMUX" ] && [ -z "$TMUX" ]; then
