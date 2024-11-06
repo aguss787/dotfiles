@@ -1,3 +1,8 @@
+# Add deno completions to search path
+if [ -x "/home/$USER/.deno" ]; then
+  if [[ ":$FPATH:" != *":/home/$USER/.zsh/completions:"* ]]; then export FPATH="/home/$USER/.zsh/completions:$FPATH"; fi
+fi
+
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
@@ -129,11 +134,10 @@ fi
 
 source ~/.zsh/catppuccin_mocha-zsh-syntax-highlighting.zsh
 
-# Add deno completions to search path
-if [[ ":$FPATH:" != *":/home/$USER/.zsh/completions:"* ]]; then export FPATH="/home/$USER/.zsh/completions:$FPATH"; fi
+if [ -x "/home/$USER/.deno" ]; then
+  . "/home/$USER/.deno/env"
+fi
 
-. "/home/$USER/.deno/env"
-
-# Initialize zsh completions (added by deno install script)
 autoload -Uz compinit
 compinit
+
