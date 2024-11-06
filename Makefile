@@ -1,5 +1,9 @@
-all: nvim-config tmux-config zshrc rofi-config lazygit-config gnupg-config
+all: wezterm-config nvim-config tmux-config zshrc rofi-config lazygit-config gnupg-config
 server: nvim-config tmux-config zshrc gnupg-config
+
+wezterm-config:
+	@echo "Setting up wezterm..."
+	ln -s $(shell pwd)/wezterm/.wezterm.lua ~/.wezterm.lua
 
 nvim-config: lazygit-config
 	@echo "Setting up nvim..."
