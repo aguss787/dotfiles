@@ -7,6 +7,7 @@ wezterm-config:
 
 nvim-config: lazygit-config
 	@echo "Setting up nvim..."
+	mkdir -p ~/.config
 	ln -s $(shell pwd)/nvim ~/.config/nvim
 
 tmux-config:
@@ -19,14 +20,17 @@ zshrc:
 
 rofi-config:
 	@echo "Setting up rofi..."
+	mkdir -p ~/.config
 	ln -s $(shell pwd)/rofi ~/.config/rofi
 
 lazygit-config:
 	@echo "Setting up lazygit..."
+	mkdir -p ~/.config
 	ln -s $(shell pwd)/lazygit ~/.config/lazygit
 
 gnupg-config:
 	@echo "Setting up gnupg..."
+	mkdir -p ~/.gnupg
 	ln -s $(shell pwd)/gnupg/gpg.conf ~/.gnupg/gpg.conf
 
 clean:
