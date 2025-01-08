@@ -5,6 +5,7 @@ vim.g.maplocalleader = " "
 
 vim.opt.relativenumber = true
 vim.opt.number = true
+vim.opt.scrolloff = 15
 
 vim.opt.tabstop = 2
 vim.opt.softtabstop = 2
@@ -35,7 +36,7 @@ vim.opt.smartcase = true
 vim.opt.clipboard:append("unnamedplus")
 
 vim.diagnostic.config({
-	virtual_text = true,
+  virtual_text = true,
 })
 
 -- Show line diagnostics automatically in hover window
