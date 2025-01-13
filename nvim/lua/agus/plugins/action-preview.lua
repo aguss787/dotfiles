@@ -1,3 +1,1 @@
-return {
-	"aznhe21/actions-preview.nvim",
-}
+return {"aznhe21/actions-preview.nvim"}

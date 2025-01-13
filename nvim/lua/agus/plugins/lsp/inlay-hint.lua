@@ -1,5 +1,1 @@
-return {
-	"felpafel/inlay-hint.nvim",
-	event = "LspAttach",
-	config = true,
-}
+return {"felpafel/inlay-hint.nvim", event = "LspAttach", config = true}

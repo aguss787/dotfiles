@@ -1,4 +1,1 @@
-return {
-	"smjonas/inc-rename.nvim",
-	opts = {},
-}
+return {"smjonas/inc-rename.nvim", opts = {}}

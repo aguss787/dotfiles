@@ -1,4 +1,1 @@
-return {
-	"zbirenbaum/copilot-cmp",
-	opts = {},
-}
+return {"zbirenbaum/copilot-cmp", opts = {}}
