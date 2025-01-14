@@ -30,7 +30,7 @@ return {
                 default_settings = {
                     -- Rust-analyzer language server configuration
                     ["rust-analyzer"] = {
-                        cargo = {feature = "all"},
+                        cargo = {features = "all"},
                         -- Disable clippy
                         checkOnSave = {command = "check"},
                         inlayHints = {maxLength = 100}
