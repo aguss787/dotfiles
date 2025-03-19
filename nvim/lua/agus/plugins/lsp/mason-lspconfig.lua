@@ -72,6 +72,22 @@ return {
                 }
 
                 require("lspconfig").yamlls.setup({capabilities = capabilities})
+            end,
+            ["rust_analyzer"] = function()
+                local capabilities =
+                    require("cmp_nvim_lsp").default_capabilities()
+
+                require("lspconfig").rust_analyzer.setup({
+                    capabilities = capabilities,
+                    settings = {
+                        ["rust-analyzer"] = {
+                            cargo = {feature = "all"},
+                            -- Disable clippy
+                            checkOnSave = {command = "clippy"},
+                            inlayHints = {maxLength = 100}
+                        }
+                    }
+                })
             end
         }
     }
