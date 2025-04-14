@@ -104,7 +104,12 @@ source $ZSH/oh-my-zsh.sh
 # export ARCHFLAGS="-arch x86_64"
 
 # set default editor to vim
-export EDITOR=nvim
+if [ -x "$(command -v vim)" ]; then
+  export EDITOR=vim
+fi
+if [ -x "$(command -v nvim)" ]; then
+  export EDITOR=nvim
+fi
 
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
@@ -115,9 +120,12 @@ export EDITOR=nvim
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"source /usr/share/nvm/init-nvm.sh
 # source /usr/share/nvm/init-nvm.sh
-alias rkube="rancher kubectl"
-alias vim="nvim"
-alias cd="z"
+if [ -x "$(command -v rancher)" ]; then
+  alias rkube="rancher kubectl"
+fi
+if [ -x "$(command -v z)" ]; then
+  alias cd="z"
+fi
 
 export GPG_TTY=$(tty)
 export KUBE_EDITOR="nvim"
