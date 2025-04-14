@@ -81,7 +81,7 @@ return {
                     capabilities = capabilities,
                     settings = {
                         ["rust-analyzer"] = {
-                            cargo = {feature = "all"},
+                            cargo = {features = "all"},
                             -- Disable clippy
                             checkOnSave = {command = "clippy"},
                             inlayHints = {maxLength = 100}
