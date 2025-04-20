@@ -123,9 +123,6 @@ fi
 if [ -x "$(command -v rancher)" ]; then
   alias rkube="rancher kubectl"
 fi
-if [ -x "$(command -v z)" ]; then
-  alias cd="z"
-fi
 
 export GPG_TTY=$(tty)
 export KUBE_EDITOR="nvim"
@@ -133,6 +130,7 @@ export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/ssh-agent.socket"
 
 if [ -x "$(command -v zoxide)" ]; then
   eval "$(zoxide init zsh)"
+  alias cd="z"
 fi
 
 if [ -x "$(command -v fzf)" ]; then
@@ -149,6 +147,10 @@ source ~/.zsh/catppuccin_mocha-zsh-syntax-highlighting.zsh
 
 if [ -x "/home/$USER/.deno" ]; then
   . "/home/$USER/.deno/env"
+fi
+
+if [ -x "/home/$USER/.zshrc-local" ]; then
+  . "/home/$USER/.zshrc-local"
 fi
 
 autoload -Uz compinit
