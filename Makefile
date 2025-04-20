@@ -1,4 +1,4 @@
-all: wezterm-config nvim-config tmux-config zshrc rofi-config lazygit-config gnupg-config
+all: clean wezterm-config nvim-config tmux-config zshrc rofi-config lazygit-config gnupg-config
 server: nvim-config tmux-config zshrc gnupg-config
 
 wezterm-config:
@@ -12,10 +12,12 @@ nvim-config: lazygit-config
 
 tmux-config:
 	@echo "Setting up tmux..."
+	$(shell pwd)/scripts/tmux-setup.sh
 	ln -s $(shell pwd)/tmux/.tmux.conf ~/.tmux.conf
 
 zshrc:
 	@echo "Setting up zsh..."
+	$(shell pwd)/scripts/omz-setup.sh
 	ln -s $(shell pwd)/zsh/.zshrc ~/.zshrc
 
 rofi-config:
