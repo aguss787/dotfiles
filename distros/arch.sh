@@ -11,7 +11,7 @@ if ! [ -x $(command -v yay) ]; then
 fi
 
 # upgrade and install packages
-yay -Syyu\
+yay -Syyu --noconfirm\
   pambase polkit openssh\
   vi neovim\
   npm yarn\
