@@ -145,13 +145,18 @@ fi
 
 source ~/.zsh/catppuccin_mocha-zsh-syntax-highlighting.zsh
 
-if [ -x "/home/$USER/.deno" ]; then
-  . "/home/$USER/.deno/env"
-fi
+declare -a files=(
+  "/home/$USER/.deno"
+  "/home/$USER/.zshrc-local"
+  "/Users/$USER/.zshrc-local" # Supports macOS home directory
+)
 
-if [ -x "/home/$USER/.zshrc-local" ]; then
-  . "/home/$USER/.zshrc-local"
-fi
+for i in "${files[@]}"
+do
+  if [ -x "$i" ]; then
+    . "$i"
+  fi
+done
 
 autoload -Uz compinit
 compinit
