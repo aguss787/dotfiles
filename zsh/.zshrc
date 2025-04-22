@@ -145,6 +145,9 @@ fi
 
 source ~/.zsh/catppuccin_mocha-zsh-syntax-highlighting.zsh
 
+autoload -Uz compinit
+compinit
+
 declare -a files=(
   "/home/$USER/.deno"
   "/home/$USER/.zshrc-local"
@@ -153,11 +156,8 @@ declare -a files=(
 
 for i in "${files[@]}"
 do
-  if [ -x "$i" ]; then
+  if [ -f "$i" ]; then
     . "$i"
   fi
 done
-
-autoload -Uz compinit
-compinit
 
