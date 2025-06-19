@@ -45,7 +45,7 @@ return {
         },
         strategies = {
             -- chat = {adapter = "anthropic"},
-            chat = {adapter = "copilot"},
+            chat = {adapter = "gemini"},
             inline = {
                 adapter = "copilotgpt",
                 keymaps = {
@@ -63,6 +63,16 @@ return {
             cmd = {adapter = "copilotgpt"}
         },
         adapters = {
+            gemini = function()
+                return require("codecompanion.adapters").extend("gemini", {
+                    env = {
+                        api_key = "cmd:cat ~/.config/codecompanion/gemini.key | tr -d ' \n'"
+                    },
+                    schema = {
+                        model = {default = "gemini-2.5-pro-preview-05-06"}
+                    }
+                })
+            end,
             copilot = function()
                 return require("codecompanion.adapters").extend("copilot", {
                     schema = {model = {default = "gemini-2.5-pro"}}
@@ -89,20 +99,25 @@ return {
                                 -- Enable turbo mode!!!
                                 vim.g.codecompanion_auto_tool_mode = true
 
-                                return [[### Instructions
-
-Your instructions here
-
-### Steps to Follow
+                                return [[### Steps to Follow
 
 You are required to write code following the instructions provided above and test the correctness by running the designated test suite. Follow these steps exactly:
 
-1. Update the code in #buffer using the @mcp tool
+1. Update the code in the project using the @mcp tool
 2. Then use the @cmd_runner tool to run the test suite with `cargo fmt && cargo test && cargo clippy -- -D warnings` (do this after you have updated the code)
 3. Make sure you trigger both tools in the same response
 
-Always read the file using @mcp tool before making any changes to make sure you edit the file correctly. 
-We'll repeat this cycle until the tests pass. Ensure no deviations from these steps.]]
+We'll repeat this cycle until the tests pass. Ensure no deviations from these steps.
+
+Hints:
+- Always read the file using @mcp tool before making any changes to make sure you edit the file correctly. 
+- follow the README.md to setup the test
+- Use context7 when you have issues with external library
+- #buffer is the code that I'm currently looking at
+
+### Instructions
+
+Your instructions here]]
                             end
                         }
                     }, {
@@ -120,7 +135,7 @@ We'll repeat this cycle until the tests pass. Ensure no deviations from these st
                             repeat_until = function(chat)
                                 return chat.tools.flags.testing == true
                             end,
-                            content = "The tests have failed. Can you edit the buffer and run the test suite again?"
+                            content = "The tests have failed. Make sure you follow the README and run the test suite again"
                         }
                     }
                 }
