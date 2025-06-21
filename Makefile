@@ -1,9 +1,14 @@
-all: clean wezterm-config nvim-config tmux-config zshrc rofi-config lazygit-config gnupg-config
+all: clean wezterm-config ghostty-config nvim-config tmux-config zshrc rofi-config lazygit-config gnupg-config
 server: nvim-config tmux-config zshrc gnupg-config
 
 wezterm-config:
 	@echo "Setting up wezterm..."
 	ln -s $(shell pwd)/wezterm/.wezterm.lua ~/.wezterm.lua
+
+ghostty-config:
+	@echo "Setting up ghostty..."
+	mkdir -p ~/.config
+	ln -s $(shell pwd)/ghostty ~/.config/ghostty
 
 nvim-config: lazygit-config
 	@echo "Setting up nvim..."
@@ -44,6 +49,7 @@ clean:
 	rm -rf ~/.gnupg/gpg.conf
 	rm -rf ~/.wezterm.lua
 	rm -rf ~/.config/rofi
+	rm -rf ~/.config/ghostty
 
 timestamp = $(shell date +%s)
 
@@ -57,3 +63,4 @@ backup:
 	cp -R ~/.gnupg/gpg.conf ~/.dotfiles/backup/$(timestamp)
 	cp -R ~/.wezterm.lua ~/.dotfiles/backup/$(timestamp)
 	cp -R ~/.config/rofi ~/.dotfiles/backup/$(timestamp)
+	cp -R ~/.config/ghostty ~/.dotfiles/backup/$(timestamp)
