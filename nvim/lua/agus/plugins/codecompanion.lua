@@ -44,10 +44,20 @@ return {
             }
         },
         strategies = {
-            -- chat = {adapter = "anthropic"},
-            chat = {adapter = "gemini"},
+            chat = {
+                adapter = "gemini_flash",
+                tools = {
+                    opts = {
+                        auto_submit_errors = true,
+                        auto_submit_success = true,
+                        default_tools = {
+                            "use_mcp_tool", "access_mcp_resource", "mcp"
+                        }
+                    }
+                }
+            },
             inline = {
-                adapter = "copilotgpt",
+                adapter = "gemini_flash",
                 keymaps = {
                     accept_change = {
                         modes = {n = "ga"},
@@ -60,35 +70,39 @@ return {
                 }
 
             },
-            cmd = {adapter = "copilotgpt"}
+            cmd = {adapter = "gemini_flash"}
         },
         adapters = {
-            gemini = function()
+            opts = {show_defaults = false},
+            gemini_pro = function()
                 return require("codecompanion.adapters").extend("gemini", {
+                    name = "gemini_pro",
+                    formatted_name = "Gemini Pro",
                     env = {
                         api_key = "cmd:cat ~/.config/codecompanion/gemini.key | tr -d ' \n'"
                     },
-                    schema = {
-                        model = {default = "gemini-2.5-pro-preview-05-06"}
-                    }
-                })
-            end,
-            copilot = function()
-                return require("codecompanion.adapters").extend("copilot", {
                     schema = {model = {default = "gemini-2.5-pro"}}
                 })
             end,
-            copilotgpt = function()
-                return require("codecompanion.adapters").extend("copilot", {
-                    schema = {model = {default = "gpt-4.1"}}
+            gemini_flash = function()
+                return require("codecompanion.adapters").extend("gemini", {
+                    name = "gemini_flash",
+                    formatted_name = "Gemini Flash",
+                    env = {
+                        api_key = "cmd:cat ~/.config/codecompanion/gemini.key | tr -d ' \n'"
+                    },
+                    schema = {model = {default = "gemini-2.5-flash"}}
                 })
+            end,
+            copilot = function()
+                return require("codecompanion.adapters").extend("copilot", {})
             end
         },
         prompt_library = {
             ["Agent"] = {
                 strategy = "workflow",
                 description = "Use a workflow to repeatedly edit then test code",
-                opts = {index = -999999999, is_default = true, short_name = "a"},
+                opts = {index = 1, is_default = true, short_name = "a"},
                 prompts = {
                     {
                         {
@@ -99,21 +113,47 @@ return {
                                 -- Enable turbo mode!!!
                                 vim.g.codecompanion_auto_tool_mode = true
 
-                                return [[### Steps to Follow
+                                local project_root = vim.fn.getcwd()
+                                local ai_config_path = project_root ..
+                                                           "/.ai.json"
+                                local test_cmd = ""
 
-You are required to write code following the instructions provided above and test the correctness by running the designated test suite. Follow these steps exactly:
+                                local file = io.open(ai_config_path, "r")
+                                if file then
+                                    local content = file:read("*all")
+                                    file:close()
+                                    local config_table = vim.fn.json_decode(
+                                                             content)
+                                    if config_table and config_table.test_cmd then
+                                        test_cmd = config_table.test_cmd
+                                    end
+                                end
 
-1. Update the code in the project using the @mcp tool
-2. Then use the @cmd_runner tool to run the test suite with `cargo fmt && cargo test && cargo clippy -- -D warnings` (do this after you have updated the code)
-3. Make sure you trigger both tools in the same response
+                                local steps_content =
+                                    [[### Steps to Follow
 
-We'll repeat this cycle until the tests pass. Ensure no deviations from these steps.
+You are required to write code following the instructions provided below and test the correctness by running the designated test suite. Follow these steps exactly:
+
+1. Understand the context by reading #buffer and other required files using @mcp
+2. Plan carefully on how you will fulfill the requirements.
+3. Update the code in the project using the @mcp tool
+]]
+
+                                local test_steps = ""
+                                if test_cmd ~= "" then
+                                    test_steps = string.format(
+                                                     [[4. Then use the @cmd_runner tool to run the test suite with `%s` (do this after you have updated the code)
+5. Make sure you trigger both tools in the same response
+]], test_cmd)
+                                end
+
+                                return steps_content .. test_steps .. [[
+
+We\'ll repeat this cycle until the requirements is met. Ensure no deviations from these steps.
 
 Hints:
 - Always read the file using @mcp tool before making any changes to make sure you edit the file correctly. 
-- follow the README.md to setup the test
 - Use context7 when you have issues with external library
-- #buffer is the code that I'm currently looking at
 
 ### Instructions
 
@@ -152,3 +192,4 @@ Your instructions here]]
         }
     }
 }
+
