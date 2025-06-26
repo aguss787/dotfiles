@@ -210,6 +210,14 @@ Your instructions here]]
             "<leader>rr",
             "<cmd>CodeCompanionChat toggle<cr>",
             desc = "Toggle chat"
+        }, {
+            "<leader>rf",
+            "<cmd>CodeCompanionChat gemini_flash<cr>",
+            desc = "New Chat (Gemini Flash)"
+        }, {
+            "<leader>rs",
+            "<cmd>CodeCompanionChat gemini_pro<cr>",
+            desc = "New Chat (Gemini Pro)"
         }
     }
 }
