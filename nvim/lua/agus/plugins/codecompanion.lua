@@ -99,6 +99,27 @@ return {
             end
         },
         prompt_library = {
+            ["Commit"] = {
+                strategy = "workflow",
+                description = "Commit changes in the current revision",
+                opts = {index = 2, short_name = "commit"},
+                prompts = {
+                    {
+                        {
+                            role = constants.USER_ROLE,
+                            opts = {auto_submit = true},
+                            content = function()
+                                vim.g.codecompanion_auto_tool_mode = true
+                                return
+                                    [[commit changes in the current revision. 
+the description should be based on the diff and should be formatted based on convetional commit.
+follow the style of the existing commits.  
+get the working directory absolute path from neovim mcp server]]
+                            end
+                        }
+                    }
+                }
+            },
             ["Agent"] = {
                 strategy = "workflow",
                 description = "Use a workflow to repeatedly edit then test code",
