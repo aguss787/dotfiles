@@ -33,6 +33,7 @@ return {
         }
     },
     opts = {
+        opts = {log_level = "INFO", job_start_delay = 100, submit_delay = 100},
         extensions = {
             mcphub = {
                 callback = "mcphub.extensions.codecompanion",
@@ -123,7 +124,7 @@ get the working directory absolute path from neovim mcp server]]
             ["Agent"] = {
                 strategy = "workflow",
                 description = "Use a workflow to repeatedly edit then test code",
-                opts = {index = 1, is_default = true, short_name = "a"},
+                opts = {index = 1, short_name = "a"},
                 prompts = {
                     {
                         {
@@ -201,6 +202,9 @@ Your instructions here]]
                     }
                 }
             }
+        },
+        display = {
+            action_palette = {opts = {show_default_prompt_library = false}}
         }
     },
     keys = {
