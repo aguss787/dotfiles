@@ -18,23 +18,27 @@ return {
                     native_servers = {
                         system_info = {
                             name = "system_info",
-                            displayName = "System Info"
+                            displayName = "System Info",
+                            capabilities = {
+                                resources = {
+                                    {
+                                        name = "cwd",
+                                        description = "Current working directory",
+                                        uri = "system://cwd",
+                                        handler = function(req, res)
+                                            if req.uri ~= "system://cwd" then
+                                                res:error("Invalid URI: " ..
+                                                              req.uri)
+                                            end
+
+                                            local cwd = vim.fn.getcwd()
+                                            return res:text(cwd)
+                                        end
+                                    }
+                                }
+                            }
                         }
                     }
-                })
-
-                mcphub.add_resource("system_info", {
-                    name = "cwd",
-                    description = "Current working directory",
-                    uri = "system://cwd",
-                    handler = function(req, res)
-                        if req.uri ~= "system://cwd" then
-                            res:error("Invalid URI: " .. req.uri)
-                        end
-
-                        local cwd = vim.fn.getcwd()
-                        return res:text(cwd)
-                    end
                 })
             end
         }, {
