@@ -128,8 +128,11 @@ return {
                                 return
                                     [[commit changes in the current revision. 
 the description should be based on the diff and should be formatted based on convetional commit.
+look at the last 25 commits to understand the commit message style.
 follow the style of the existing commits.  
-working directory is #system://cwd ]]
+working directory is #system://cwd 
+
+I have asked you to commit it, you don't need to ask for permission again]]
                             end
                         }
                     }
@@ -149,7 +152,8 @@ working directory is #system://cwd ]]
                                 return
                                     [[Suggest a commit message based on the diff. 
 The description should be based on the diff and should be formatted based on conventional commit.
-Follow the style of the existing commits. 
+look at the last 25 commits to understand the commit message style.
+follow the style of the existing commits.  
 working directory is #system://cwd
 DO NOT COMMIT THE REVISION.]]
                             end
