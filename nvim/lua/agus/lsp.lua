@@ -1,3 +1,71 @@
+local capabilities = require("cmp_nvim_lsp").default_capabilities()
+
+vim.lsp.config("rust_analyzer", {
+    capabilities = capabilities,
+    settings = {
+        ["rust-analyzer"] = {
+            cargo = {features = "all"},
+            -- Disable clippy
+            checkOnSave = {command = "check"},
+            inlayHints = {maxLength = 100}
+        }
+    }
+})
+
+-- Default handlers for servers from mason-lspconfig.nvim's ensure_installed
+vim.lsp.config("lua_ls", {capabilities = capabilities})
+vim.lsp.config("pyright", {capabilities = capabilities})
+vim.lsp.config("bashls", {capabilities = capabilities})
+vim.lsp.config("elmls", {capabilities = capabilities})
+vim.lsp.config("clangd", {capabilities = capabilities})
+
+vim.lsp.config("cucumber_language_server", {
+    capabilities = capabilities,
+    settings = {
+        cucumber = {
+            glue = {
+                -- Cucumber-JVM
+                "src/test/**/*.java", -- Cucumber-Js
+                "features/**/*.ts", "features/**/*.tsx", "features/**/*.js",
+                "features/**/*.jsx", -- Behat
+                "features/**/*.php", -- Behave
+                "features/**/*.py", -- Pytest-BDD
+                "tests/**/*.py", -- Cucumber Rust
+                "tests/**/*.rs", "features/**/*.rs", -- Cucumber-Ruby
+                "features/**/*.rb", -- SpecFlow
+                "*specs*/**/*.cs", -- Godog
+                "features/**/*_test.go", -- Custom
+                "**/test.rs"
+            }
+        }
+    }
+})
+
+vim.lsp.config("gopls", {
+    capabilities = capabilities,
+    settings = {
+        gopls = {
+            hints = {
+                assignVariableTypes = true,
+                compositeLiteralFields = true,
+                compositeLiteralTypes = true,
+                constantValues = true,
+                functionTypeParameters = true,
+                parameterNames = true,
+                rangeVariableTypes = true
+            }
+        }
+    }
+})
+
+-- Create a copy of capabilities for yamlls to modify it locally
+local yamlls_capabilities = vim.deepcopy(capabilities)
+yamlls_capabilities.textDocument.foldingRange = {
+    dynamicRegistration = false,
+    lineFoldingOnly = true
+}
+vim.lsp.config("yamlls", {capabilities = yamlls_capabilities})
+
 vim.api.nvim_create_autocmd("LspAttach", {
     group = vim.api.nvim_create_augroup("LspMappings", {}),
     callback = function(ev)
