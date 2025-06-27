@@ -93,6 +93,16 @@ return {
         },
         adapters = {
             opts = {show_defaults = false},
+            claude = function()
+                return require("codecompanion.adapters").extend("anthropic", {
+                    name = "claude",
+                    formatted_name = "Claude",
+                    env = {
+                        api_key = "cmd:cat ~/.config/codecompanion/anthropic.key | tr -d ' \n'"
+                    },
+                    schema = {model = {default = "claude-sonnet-4-20250514"}}
+                })
+            end,
             gemini_pro = function()
                 return require("codecompanion.adapters").extend("gemini", {
                     name = "gemini_pro",
