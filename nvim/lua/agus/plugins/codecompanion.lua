@@ -112,6 +112,28 @@ get the working directory absolute path from neovim mcp server]]
                     }
                 }
             },
+            ["Commit Message"] = {
+                strategy = "workflow",
+                description = "Suggest a commit message based on the diff",
+                opts = {index = 3, short_name = "cm"},
+                prompts = {
+                    {
+                        {
+                            role = constants.USER_ROLE,
+                            opts = {auto_submit = true},
+                            content = function()
+                                vim.g.codecompanion_auto_tool_mode = true
+                                return
+                                    [[Suggest a commit message based on the diff. 
+The description should be based on the diff and should be formatted based on conventional commit.
+Follow the style of the existing commits. 
+Get the working directory absolute path from neovim mcp server. 
+DO NOT COMMIT THE REVISION.]]
+                            end
+                        }
+                    }
+                }
+            },
             ["Agent"] = {
                 strategy = "workflow",
                 description = "Use a workflow to repeatedly edit then test code",
