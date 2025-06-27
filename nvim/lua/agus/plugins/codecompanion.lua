@@ -12,7 +12,30 @@ return {
             dependencies = {"nvim-lua/plenary.nvim"},
             build = "npm install -g mcp-hub@latest", -- Installs `mcp-hub` node binary globally
             config = function()
-                require("mcphub").setup({auto_approve = true})
+                local mcphub = require("mcphub")
+                mcphub.setup({
+                    auto_approve = true,
+                    native_servers = {
+                        system_info = {
+                            name = "system_info",
+                            displayName = "System Info"
+                        }
+                    }
+                })
+
+                mcphub.add_resource("system_info", {
+                    name = "cwd",
+                    description = "Current working directory",
+                    uri = "system://cwd",
+                    handler = function(req, res)
+                        if req.uri ~= "system://cwd" then
+                            res:error("Invalid URI: " .. req.uri)
+                        end
+
+                        local cwd = vim.fn.getcwd()
+                        return res:text(cwd)
+                    end
+                })
             end
         }, {
             "github/copilot.vim",
@@ -106,7 +129,7 @@ return {
                                     [[commit changes in the current revision. 
 the description should be based on the diff and should be formatted based on convetional commit.
 follow the style of the existing commits.  
-get the working directory absolute path from neovim mcp server]]
+working directory is #system://cwd ]]
                             end
                         }
                     }
@@ -127,7 +150,7 @@ get the working directory absolute path from neovim mcp server]]
                                     [[Suggest a commit message based on the diff. 
 The description should be based on the diff and should be formatted based on conventional commit.
 Follow the style of the existing commits. 
-Get the working directory absolute path from neovim mcp server. 
+working directory is #system://cwd
 DO NOT COMMIT THE REVISION.]]
                             end
                         }
