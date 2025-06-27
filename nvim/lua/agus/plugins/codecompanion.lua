@@ -122,9 +122,6 @@ return {
                     },
                     schema = {model = {default = "gemini-2.5-flash"}}
                 })
-            end,
-            copilot = function()
-                return require("codecompanion.adapters").extend("copilot", {})
             end
         },
         prompt_library = {
