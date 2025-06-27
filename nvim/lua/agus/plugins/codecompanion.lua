@@ -7,16 +7,7 @@ return {
         "nvim-lua/plenary.nvim", "nvim-treesitter/nvim-treesitter", {
             "MeanderingProgrammer/render-markdown.nvim",
             ft = {"markdown", "codecompanion"}
-        }, {
-            "OXY2DEV/markview.nvim",
-            lazy = false,
-            opts = {
-                preview = {
-                    filetypes = {"markdown", "codecompanion"},
-                    ignore_buftypes = {}
-                }
-            }
-        }, {
+        }, {"OXY2DEV/markview.nvim"}, {
             "ravitemer/mcphub.nvim",
             dependencies = {"nvim-lua/plenary.nvim"},
             build = "npm install -g mcp-hub@latest", -- Installs `mcp-hub` node binary globally
