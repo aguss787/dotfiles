@@ -272,7 +272,12 @@ Your instructions here]]
     keys = {
         {"<leader>fr", "<cmd>CodeCompanionAction<cr>", desc = "Find Files"},
         {"<leader>ra", "<cmd>CodeCompanion /a<cr>", desc = "Agent"},
-        {"<leader>rc", "<cmd>CodeCompanion /c<cr>", desc = "Commit"},
+        {"<leader>rC", "<cmd>CodeCompanion /c<cr>", desc = "Commit"},
+        {
+            "<leader>rc",
+            "<cmd>CodeCompanion /cm<cr>",
+            desc = "Suggest commit message"
+        },
         {
             "<leader>rr",
             "<cmd>CodeCompanionChat toggle<cr>",
