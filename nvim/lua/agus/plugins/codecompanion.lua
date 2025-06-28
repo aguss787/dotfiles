@@ -1,4 +1,15 @@
 local constants = {LLM_ROLE = "llm", USER_ROLE = "user", SYSTEM_ROLE = "system"}
+local commit_system_prompt =
+    [[You will commit the code changes for the user. Follow these rules:
+
+- You never ask the user for information
+- You will get all the necessary information from the mcp servers
+- You should understand that the working directory is #system://cwd
+- You have strong bias towards using conventional commit
+- You will try to replicate the existing commit style as much as possible. You should look at the last 25 commit using mcp to understand the user style
+- You will make the title and body as clear and simple as possible. You should look at the project diff using mcp to understand what changes
+- You commit the changes using the commit message if the user asked for it
+]]
 
 return {
     "olimorris/codecompanion.nvim",
@@ -126,49 +137,45 @@ return {
         },
         prompt_library = {
             ["Commit"] = {
-                strategy = "workflow",
+                strategy = "chat",
                 description = "Commit changes in the current revision",
-                opts = {index = 2, short_name = "commit"},
+                opts = {
+                    index = 2,
+                    short_name = "c",
+                    auto_submit = true,
+                    user_prompt = false
+                },
                 prompts = {
                     {
-                        {
-                            role = constants.USER_ROLE,
-                            opts = {auto_submit = true},
-                            content = function()
-                                vim.g.codecompanion_auto_tool_mode = true
-                                return
-                                    [[commit changes in the current revision. 
-the description should be based on the diff and should be formatted based on convetional commit.
-look at the last 25 commits to understand the commit message style.
-follow the style of the existing commits.  
-working directory is #system://cwd 
+                        role = constants.USER_ROLE,
+                        content = function()
+                            vim.g.codecompanion_auto_tool_mode = true
+                            return commit_system_prompt ..
+                                       [[commit changes in the current revision. 
 
 I have asked you to commit it, you don't need to ask for permission again]]
-                            end
-                        }
+                        end
                     }
                 }
             },
             ["Commit Message"] = {
-                strategy = "workflow",
+                strategy = "chat",
                 description = "Suggest a commit message based on the diff",
-                opts = {index = 3, short_name = "cm"},
+                opts = {
+                    index = 3,
+                    short_name = "cm",
+                    auto_submit = true,
+                    user_prompt = false
+                },
                 prompts = {
                     {
-                        {
-                            role = constants.USER_ROLE,
-                            opts = {auto_submit = true},
-                            content = function()
-                                vim.g.codecompanion_auto_tool_mode = true
-                                return
-                                    [[Suggest a commit message based on the diff. 
-The description should be based on the diff and should be formatted based on conventional commit.
-look at the last 25 commits to understand the commit message style.
-follow the style of the existing commits.  
-working directory is #system://cwd
-DO NOT COMMIT THE REVISION.]]
-                            end
-                        }
+                        role = constants.SYSTEM_ROLE,
+                        content = commit_system_prompt,
+                        opts = {visible = false}
+                    }, {
+                        role = constants.USER_ROLE,
+                        content = commit_system_prompt ..
+                            "Suggent a commit message based on the diff. DO NOT COMMIT THE REVISION."
                     }
                 }
             },
@@ -261,6 +268,7 @@ Your instructions here]]
     keys = {
         {"<leader>fr", "<cmd>CodeCompanionAction<cr>", desc = "Find Files"},
         {"<leader>ra", "<cmd>CodeCompanion /a<cr>", desc = "Agent"},
+        {"<leader>rc", "<cmd>CodeCompanion /c<cr>", desc = "Commit"},
         {
             "<leader>rr",
             "<cmd>CodeCompanionChat toggle<cr>",
