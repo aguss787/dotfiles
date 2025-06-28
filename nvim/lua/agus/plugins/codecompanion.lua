@@ -15,7 +15,8 @@ return {
     "olimorris/codecompanion.nvim",
     lazy = false,
     dependencies = {
-        "nvim-lua/plenary.nvim", "nvim-treesitter/nvim-treesitter", {
+        "nvim-lua/plenary.nvim", "nvim-treesitter/nvim-treesitter",
+        "folke/noice.nvim", {
             "MeanderingProgrammer/render-markdown.nvim",
             ft = {"markdown", "codecompanion"}
         }, {"OXY2DEV/markview.nvim"}, {
@@ -61,6 +62,9 @@ return {
             end
         }
     },
+    init = function()
+        require("agus.functions.codecompanion-notification").init()
+    end,
     opts = {
         opts = {log_level = "INFO", job_start_delay = 100, submit_delay = 100},
         extensions = {
