@@ -16,10 +16,7 @@ return {
     lazy = false,
     dependencies = {
         "nvim-lua/plenary.nvim", "nvim-treesitter/nvim-treesitter",
-        "folke/noice.nvim", {
-            "MeanderingProgrammer/render-markdown.nvim",
-            ft = {"markdown", "codecompanion"}
-        }, {"OXY2DEV/markview.nvim"}, {
+        "folke/noice.nvim", "OXY2DEV/markview.nvim", {
             "ravitemer/mcphub.nvim",
             dependencies = {"nvim-lua/plenary.nvim"},
             build = "npm install -g mcp-hub@latest", -- Installs `mcp-hub` node binary globally
