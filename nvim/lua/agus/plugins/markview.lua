@@ -7,7 +7,7 @@ return {
             ignore_buftypes = {},
 
             modes = {'n', 'v', 'i', 'c'},
-            hybrid_modes = {'n', 'i'}
+            hybrid_modes = {'n', 'v', 'i', 'c'}
         }
     }
 }
