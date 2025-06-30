@@ -260,7 +260,9 @@ Your instructions here]]
             }
         },
         display = {
-            action_palette = {opts = {show_default_prompt_library = false}}
+            action_palette = {opts = {show_default_prompt_library = false}},
+            chat = {show_settings = true, show_tool_processing = true},
+            diff = {enabled = true}
         }
     },
     keys = {
@@ -284,6 +286,17 @@ Your instructions here]]
             "<leader>rs",
             "<cmd>CodeCompanionChat gemini_pro<cr>",
             desc = "New Chat (Gemini Pro)"
+        }, {
+            "<leader>rA",
+            function()
+                local config = require("codecompanion.config")
+                local original_prompt = config.config.prompt_library["Agent"]
+                local prompt = vim.deepcopy(original_prompt)
+                prompt.adapter = "claude"
+
+                require("codecompanion").prompt_library(prompt, {})
+            end,
+            desc = "Claude Agent"
         }
     }
 }
