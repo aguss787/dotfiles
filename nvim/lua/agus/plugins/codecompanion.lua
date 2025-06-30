@@ -7,6 +7,7 @@ local commit_system_prompt =
 - You should understand that the working directory is #system://cwd
 - You have strong bias towards using conventional commit
 - You should try to replicate the existing commit style as much as possible. You should look at the last 25 commit using mcp to understand the user style
+  - use `jj log -r '..@'` to get the repository logs
 - You should make the title and body as clear and simple as possible. You should look at the project diff using mcp to understand what changes
 - You should add both title and body 
 - You commit the changes using the commit message if the user asked for it
