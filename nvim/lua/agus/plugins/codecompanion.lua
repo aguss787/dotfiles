@@ -54,13 +54,6 @@ return {
                     }
                 })
             end
-        }, {
-            "github/copilot.vim",
-            enabled = true,
-            config = function()
-                -- Disable copilot on startup 
-                vim.g.copilot_enabled = false
-            end
         }
     },
     init = function()
