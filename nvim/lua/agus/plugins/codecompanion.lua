@@ -109,7 +109,10 @@ return {
                     env = {
                         api_key = "cmd:cat ~/.config/codecompanion/anthropic.key | tr -d ' \n'"
                     },
-                    schema = {model = {default = "claude-sonnet-4-20250514"}}
+                    schema = {
+                        model = {default = "claude-sonnet-4-20250514"},
+                        extended_thinking = {default = false}
+                    }
                 })
             end,
             gemini_pro = function()
