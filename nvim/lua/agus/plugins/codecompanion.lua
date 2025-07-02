@@ -18,6 +18,40 @@ local commit_system_prompt =
 --- @class AiConfig
 --- @field test_cmd string? command to run the test suite
 
+-- Helper function to read and parse JSON config
+--- @param file_path string
+--- @return AiConfig
+local function read_ai_config(file_path)
+    local file = io.open(file_path, "r")
+    if file then
+        local content = file:read("*all")
+        file:close()
+        local success, config_table = pcall(vim.fn.json_decode, content)
+        if success and config_table then return config_table end
+    end
+    return {}
+end
+
+-- Function to get merged AI config from home and project directories
+--- @return AiConfig
+local function get_merged_ai_config()
+    -- Read from both home and project .ai.json files
+    local home_dir = os.getenv("HOME") or ""
+    local project_root = vim.fn.getcwd()
+
+    local home_config_path = home_dir .. "/.ai.json"
+    local project_config_path = project_root .. "/.ai.json"
+
+    -- Read home config first (as base)
+    local config = read_ai_config(home_config_path)
+
+    -- Read project config and merge (project overrides home)
+    local project_config = read_ai_config(project_config_path)
+    for key, value in pairs(project_config) do config[key] = value end
+
+    return config
+end
+
 return {
     "olimorris/codecompanion.nvim",
     lazy = false,
@@ -197,40 +231,8 @@ I have asked you to commit it, you don't need to ask for permission again]]
                                 -- Enable turbo mode!!!
                                 vim.g.codecompanion_auto_tool_mode = true
 
-                                -- Helper function to read and parse JSON config
-                                local function read_ai_config(file_path)
-                                    local file = io.open(file_path, "r")
-                                    if file then
-                                        local content = file:read("*all")
-                                        file:close()
-                                        local success, config_table = pcall(
-                                                                          vim.fn
-                                                                              .json_decode,
-                                                                          content)
-                                        if success and config_table then
-                                            return config_table
-                                        end
-                                    end
-                                    return {}
-                                end
-
-                                -- Read from both home and project .ai.json files
-                                local home_dir = os.getenv("HOME") or ""
-                                local project_root = vim.fn.getcwd()
-
-                                local home_config_path = home_dir .. "/.ai.json"
-                                local project_config_path = project_root ..
-                                                                "/.ai.json"
-
-                                -- Read home config first (as base)
-                                local config = read_ai_config(home_config_path)
-
-                                -- Read project config and merge (project overrides home)
-                                local project_config = read_ai_config(
-                                                           project_config_path)
-                                for key, value in pairs(project_config) do
-                                    config[key] = value
-                                end
+                                -- Get merged AI config
+                                local config = get_merged_ai_config()
 
                                 -- Extract test_cmd with fallback
                                 local test_cmd = config.test_cmd or ""
