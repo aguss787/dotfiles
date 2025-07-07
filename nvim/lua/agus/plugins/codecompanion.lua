@@ -110,7 +110,7 @@ return {
         },
         strategies = {
             chat = {
-                adapter = "gemini_flash",
+                adapter = "claude",
                 tools = {
                     opts = {
                         auto_submit_errors = true,
@@ -122,7 +122,7 @@ return {
                 }
             },
             inline = {
-                adapter = "gemini_flash",
+                adapter = "claude",
                 keymaps = {
                     accept_change = {
                         modes = {n = "ga"},
@@ -135,7 +135,7 @@ return {
                 }
 
             },
-            cmd = {adapter = "gemini_flash"}
+            cmd = {adapter = "claude"}
         },
         adapters = {
             opts = {show_defaults = false},
@@ -175,6 +175,7 @@ return {
         },
         prompt_library = {
             ["Commit"] = {
+                adapter = "gemini_flash",
                 strategy = "chat",
                 description = "Commit changes in the current revision",
                 opts = {
@@ -197,6 +198,7 @@ I have asked you to commit it, you don't need to ask for permission again]]
                 }
             },
             ["Commit Message"] = {
+                adapter = "gemini_flash",
                 strategy = "chat",
                 description = "Suggest a commit message based on the diff",
                 opts = {
