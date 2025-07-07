@@ -4,7 +4,7 @@ local commit_system_prompt =
 
 - You never ask the user for information
 - You should get all the necessary information from the mcp servers
-- You should understand that the working directory is #system://cwd
+- You should understand that the working directory is #{system://cwd}
 - You have strong bias towards using conventional commit
 - You should try to replicate the existing commit style as much as possible. You should look at the last 25 commit using mcp to understand the user style
   - if the repository is a Jujutsu (jj) repository:
@@ -244,15 +244,15 @@ I have asked you to commit it, you don't need to ask for permission again]]
 
 You are required to write code following the instructions provided below and test the correctness by running the designated test suite. Follow these steps exactly:
 
-1. Understand the context by reading #buffer and other required files using @mcp
+1. Understand the context by reading #{buffer} and other required files using @mcp
 2. Plan carefully on how you will fulfill the requirements.
-3. Update the code in the project using the @mcp tool
+3. Update the code in the project using the mcp tool
 ]]
 
                                 local test_steps = ""
                                 if test_cmd ~= "" then
                                     test_steps = string.format(
-                                                     [[4. Then use the @cmd_runner tool to run the test suite with `%s` (do this after you have updated the code)
+                                                     [[4. Then use the @{cmd_runner} tool to run the test suite with `%s` (do this after you have updated the code)
 5. Make sure you trigger both tools in the same response
 ]], test_cmd)
                                 end
@@ -262,7 +262,7 @@ You are required to write code following the instructions provided below and tes
 We\'ll repeat this cycle until the requirements is met. Ensure no deviations from these steps.
 
 Hints:
-- Always read the file using @mcp tool before making any changes to make sure you edit the file correctly. 
+- Always read the file using mcp tool before making any changes to make sure you edit the file correctly. 
 - Use context7 when you have issues with external library
 
 ### Instructions
