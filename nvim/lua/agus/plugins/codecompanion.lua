@@ -7,7 +7,7 @@ local commit_system_prompt =
 - You should understand that the working directory is #system://cwd
 - You have strong bias towards using conventional commit
 - You should try to replicate the existing commit style as much as possible. You should look at the last 25 commit using mcp to understand the user style
-  - if the repository is a Jujutsi (jj) repository:
+  - if the repository is a Jujutsu (jj) repository:
     - use revision '..@' to for the log message
     - use builtin_log_detailed as the template
 - You should make the title and body as clear and simple as possible. You should look at the project diff using mcp to understand what changes
