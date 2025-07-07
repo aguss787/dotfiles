@@ -324,7 +324,7 @@ Your instructions here]]
                 local config = require("codecompanion.config")
                 local original_prompt = config.config.prompt_library["Agent"]
                 local prompt = vim.deepcopy(original_prompt)
-                prompt.adapter = "claude"
+                prompt.adapter = "gemini_flash"
 
                 require("codecompanion").prompt_library(prompt, {})
             end,
