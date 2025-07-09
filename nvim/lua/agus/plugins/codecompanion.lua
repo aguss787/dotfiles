@@ -15,6 +15,16 @@ local commit_system_prompt =
 - You commit the changes using the commit message if the user asked for it
 ]]
 
+-- Function to start an agent prompt with a specific adapter
+local function start_agent_prompt(adapter)
+    local config = require("codecompanion.config")
+    local original_prompt = config.config.prompt_library["Agent"]
+    local prompt = vim.deepcopy(original_prompt)
+    prompt.adapter = adapter
+
+    require("codecompanion").prompt_library(prompt, {})
+end
+
 --- @class AiConfig
 --- @field test_cmd string? command to run the test suite
 
@@ -148,6 +158,19 @@ return {
                     },
                     schema = {
                         model = {default = "claude-sonnet-4-20250514"},
+                        extended_thinking = {default = false}
+                    }
+                })
+            end,
+            claude_haiku = function()
+                return require("codecompanion.adapters").extend("anthropic", {
+                    name = "claude_haiku",
+                    formatted_name = "Claude",
+                    env = {
+                        api_key = "cmd:cat ~/.config/codecompanion/anthropic.key | tr -d ' \n'"
+                    },
+                    schema = {
+                        model = {default = "claude-3-5-haiku-latest"},
                         extended_thinking = {default = false}
                     }
                 })
@@ -297,6 +320,7 @@ Your instructions here]]
             diff = {enabled = true}
         }
     },
+
     keys = {
         {"<leader>fr", "<cmd>CodeCompanionAction<cr>", desc = "Find Files"},
         {"<leader>ra", "<cmd>CodeCompanion /a<cr>", desc = "Agent"},
@@ -320,15 +344,12 @@ Your instructions here]]
             desc = "New Chat (Gemini Pro)"
         }, {
             "<leader>rA",
-            function()
-                local config = require("codecompanion.config")
-                local original_prompt = config.config.prompt_library["Agent"]
-                local prompt = vim.deepcopy(original_prompt)
-                prompt.adapter = "gemini_flash"
-
-                require("codecompanion").prompt_library(prompt, {})
-            end,
-            desc = "Claude Agent"
+            function() start_agent_prompt("claude_haiku") end,
+            desc = "Claude Haiku Agent"
+        }, {
+            "<leader>rg",
+            function() start_agent_prompt("gemini_flash") end,
+            desc = "Gemini Flash Agent"
         }
     }
 }
