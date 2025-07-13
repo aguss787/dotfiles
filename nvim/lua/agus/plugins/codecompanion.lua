@@ -308,7 +308,7 @@ Your instructions here]]
                             repeat_until = function(chat)
                                 return chat.tools.flags.testing == true
                             end,
-                            content = "The tests have failed. Make sure you follow the README and run the test suite again"
+                            content = "The tests have failed. try again"
                         }
                     }
                 }
