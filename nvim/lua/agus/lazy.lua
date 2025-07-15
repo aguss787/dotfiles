@@ -21,8 +21,7 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
     spec = {
         -- import your plugins
-        {import = "agus.plugins"}, {import = "agus.plugins.lsp"},
-        {import = "agus.plugins.copilot"}
+        {import = "agus.plugins"}, {import = "agus.plugins.lsp"}
     },
     ui = {border = "rounded"},
     -- automatically check for plugin updates
