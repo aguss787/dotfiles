@@ -12,6 +12,21 @@ local commit_system_prompt =
     - use builtin_log_detailed as the template
 - You should make the title and body as clear and simple as possible. You should look at the project diff using mcp to understand what changes
 - You should add both title and body 
+- You should avoid adding reasons for the changes on the commit message. Only add the description of the changes.
+  - Example of a good body:
+    - "Remove X from enum XYZ"
+    - "Add new error reason ABC"
+    - "Simplify error handling"
+    - "Unify order validation"
+  - Example of a bad body:
+    - "Add new error error variant ABC to improve error handling"
+      - YOU SHOULD NOT ADD REASONS TO THE COMMIT MESSAGE
+    - "Unify validation to improva readability"
+      - YOU SHOULD NOT ADD REASONS TO THE COMMIT MESSAGE
+    - "Remove unused code"
+      - It's not clear what's the unused code
+    - "Unify order validation"
+      - It's not clear what's the validation changed
 - You commit the changes using the commit message if the user asked for it
 ]]
 

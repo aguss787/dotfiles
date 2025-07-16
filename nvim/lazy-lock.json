@@ -19,6 +19,7 @@
   "harpoon": { "branch": "harpoon2", "commit": "ed1f853847ffd04b2b61c314865665e1dadf22c7" },
   "illuminate": { "branch": "master", "commit": "0d1e93684da00ab7c057410fecfc24f434698898" },
   "inc-rename.nvim": { "branch": "main", "commit": "a3e31af13844534c66041ce92f29af7745883875" },
+  "indent-blankline.nvim": { "branch": "master", "commit": "005b56001b2cb30bfa61b7986bc50657816ba4ba" },
   "inlay-hint.nvim": { "branch": "main", "commit": "ee8aa9806d1e160a2bc08b78ae60568fb6d9dbce" },
   "jupynium.nvim": { "branch": "master", "commit": "144ab6e46d2b42264c16a4f3c780d88feb0a89e8" },
   "lazy.nvim": { "branch": "main", "commit": "6c3bda4aca61a13a9c63f1c1d1b16b9d3be90d7a" },

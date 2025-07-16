@@ -12,12 +12,21 @@ vim.lsp.config("rust_analyzer", {
     }
 })
 
+local home_dir = os.getenv("HOME") or ""
+
 -- Default handlers for servers from mason-lspconfig.nvim's ensure_installed
 vim.lsp.config("lua_ls", {capabilities = capabilities})
 vim.lsp.config("pyright", {capabilities = capabilities})
 vim.lsp.config("bashls", {capabilities = capabilities})
 vim.lsp.config("elmls", {capabilities = capabilities})
 vim.lsp.config("clangd", {capabilities = capabilities})
+vim.lsp.config("elixirls", {
+    capabilities = capabilities,
+    cmd = {
+        home_dir ..
+            "/.local/share/nvim/mason/packages/elixir-ls/language_server.sh"
+    }
+})
 
 vim.lsp.config("cucumber_language_server", {
     capabilities = capabilities,
