@@ -46,6 +46,7 @@ end
 
 --- @class AiConfig
 --- @field test_cmd string? command to run the test suite
+--- @field rules string[]? list of rules to pass to the LLM
 
 -- Helper function to read and parse JSON config
 --- @param file_path string
@@ -125,172 +126,209 @@ return {
     init = function()
         require("agus.functions.codecompanion-notification").init()
     end,
-    opts = {
-        opts = {log_level = "INFO", job_start_delay = 100, submit_delay = 100},
-        extensions = {
-            mcphub = {
-                callback = "mcphub.extensions.codecompanion",
-                opts = {
-                    make_vars = true,
-                    make_slash_commands = true,
-                    show_result_in_chat = true
-                }
-            }
-        },
-        strategies = {
-            chat = {
-                adapter = "claude",
-                tools = {
+    config = function()
+        local default_config = vim.deepcopy(
+                                   require("codecompanion.config").config)
+
+        local system_prompt = function(opts)
+            local default_system_prompt = default_config.opts
+                                              .system_prompt(opts)
+            local rules = get_merged_ai_config().rules
+
+            local llm_rule = ""
+            if rules ~= nil then
+                llm_rule = [[
+
+
+<<IMPORANT>>
+You should follow the following rules to the letter:
+]]
+                for _, rule in ipairs(rules) do
+                    llm_rule = llm_rule .. "- " .. rule .. "\n"
+                end
+                llm_rule = llm_rule .. [[
+
+DO NOT VIOLATE THESE RULES AT ANY COST.
+<<IMPORANT SECTION END>>
+]]
+            end
+
+            return default_system_prompt .. llm_rule
+        end
+
+        require("codecompanion").setup({
+            opts = {
+                log_level = "INFO",
+                job_start_delay = 100,
+                submit_delay = 100,
+                system_prompt = system_prompt
+            },
+            extensions = {
+                mcphub = {
+                    callback = "mcphub.extensions.codecompanion",
                     opts = {
-                        auto_submit_errors = true,
-                        auto_submit_success = true,
-                        default_tools = {
-                            "use_mcp_tool", "access_mcp_resource", "mcp"
+                        make_vars = true,
+                        make_slash_commands = true,
+                        show_result_in_chat = true
+                    }
+                }
+            },
+            strategies = {
+                chat = {
+                    adapter = "claude",
+                    tools = {
+                        opts = {
+                            auto_submit_errors = true,
+                            auto_submit_success = true,
+                            default_tools = {
+                                "use_mcp_tool", "access_mcp_resource", "mcp"
+                            }
                         }
                     }
-                }
-            },
-            inline = {
-                adapter = "claude",
-                keymaps = {
-                    accept_change = {
-                        modes = {n = "ga"},
-                        description = "Accept the suggested change"
-                    },
-                    reject_change = {
-                        modes = {n = "gr"},
-                        description = "Reject the suggested change"
-                    }
-                }
-
-            },
-            cmd = {adapter = "claude"}
-        },
-        adapters = {
-            opts = {show_defaults = false},
-            claude = function()
-                return require("codecompanion.adapters").extend("anthropic", {
-                    name = "claude",
-                    formatted_name = "Claude",
-                    env = {
-                        api_key = "cmd:cat ~/.config/codecompanion/anthropic.key | tr -d ' \n'"
-                    },
-                    schema = {
-                        model = {default = "claude-sonnet-4-20250514"},
-                        extended_thinking = {default = false}
-                    }
-                })
-            end,
-            claude_haiku = function()
-                return require("codecompanion.adapters").extend("anthropic", {
-                    name = "claude_haiku",
-                    formatted_name = "Claude",
-                    env = {
-                        api_key = "cmd:cat ~/.config/codecompanion/anthropic.key | tr -d ' \n'"
-                    },
-                    schema = {
-                        model = {default = "claude-3-5-haiku-latest"},
-                        extended_thinking = {default = false}
-                    }
-                })
-            end,
-            gemini_pro = function()
-                return require("codecompanion.adapters").extend("gemini", {
-                    name = "gemini_pro",
-                    formatted_name = "Gemini Pro",
-                    env = {
-                        api_key = "cmd:cat ~/.config/codecompanion/gemini.key | tr -d ' \n'"
-                    },
-                    schema = {model = {default = "gemini-2.5-pro"}}
-                })
-            end,
-            gemini_flash = function()
-                return require("codecompanion.adapters").extend("gemini", {
-                    name = "gemini_flash",
-                    formatted_name = "Gemini Flash",
-                    env = {
-                        api_key = "cmd:cat ~/.config/codecompanion/gemini.key | tr -d ' \n'"
-                    },
-                    schema = {model = {default = "gemini-2.5-flash"}}
-                })
-            end
-        },
-        prompt_library = {
-            ["Commit"] = {
-                adapter = "gemini_flash",
-                strategy = "chat",
-                description = "Commit changes in the current revision",
-                opts = {
-                    index = 2,
-                    short_name = "c",
-                    auto_submit = true,
-                    user_prompt = false
                 },
-                prompts = {
-                    {
-                        role = constants.USER_ROLE,
-                        content = function()
-                            vim.g.codecompanion_auto_tool_mode = true
-                            return commit_system_prompt ..
-                                       [[commit changes in the current revision. 
+                inline = {
+                    adapter = "claude",
+                    keymaps = {
+                        accept_change = {
+                            modes = {n = "ga"},
+                            description = "Accept the suggested change"
+                        },
+                        reject_change = {
+                            modes = {n = "gr"},
+                            description = "Reject the suggested change"
+                        }
+                    }
+
+                },
+                cmd = {adapter = "claude"}
+            },
+            adapters = {
+                opts = {show_defaults = false},
+                claude = function()
+                    return require("codecompanion.adapters").extend("anthropic",
+                                                                    {
+                        name = "claude",
+                        formatted_name = "Claude",
+                        env = {
+                            api_key = "cmd:cat ~/.config/codecompanion/anthropic.key | tr -d ' \n'"
+                        },
+                        schema = {
+                            model = {default = "claude-sonnet-4-20250514"},
+                            extended_thinking = {default = false}
+                        }
+                    })
+                end,
+                claude_haiku = function()
+                    return require("codecompanion.adapters").extend("anthropic",
+                                                                    {
+                        name = "claude_haiku",
+                        formatted_name = "Claude",
+                        env = {
+                            api_key = "cmd:cat ~/.config/codecompanion/anthropic.key | tr -d ' \n'"
+                        },
+                        schema = {
+                            model = {default = "claude-3-5-haiku-latest"},
+                            extended_thinking = {default = false}
+                        }
+                    })
+                end,
+                gemini_pro = function()
+                    return require("codecompanion.adapters").extend("gemini", {
+                        name = "gemini_pro",
+                        formatted_name = "Gemini Pro",
+                        env = {
+                            api_key = "cmd:cat ~/.config/codecompanion/gemini.key | tr -d ' \n'"
+                        },
+                        schema = {model = {default = "gemini-2.5-pro"}}
+                    })
+                end,
+                gemini_flash = function()
+                    return require("codecompanion.adapters").extend("gemini", {
+                        name = "gemini_flash",
+                        formatted_name = "Gemini Flash",
+                        env = {
+                            api_key = "cmd:cat ~/.config/codecompanion/gemini.key | tr -d ' \n'"
+                        },
+                        schema = {model = {default = "gemini-2.5-flash"}}
+                    })
+                end
+            },
+            prompt_library = {
+                ["Commit"] = {
+                    adapter = "gemini_flash",
+                    strategy = "chat",
+                    description = "Commit changes in the current revision",
+                    opts = {
+                        index = 2,
+                        short_name = "c",
+                        auto_submit = true,
+                        user_prompt = false
+                    },
+                    prompts = {
+                        {
+                            role = constants.USER_ROLE,
+                            content = function()
+                                vim.g.codecompanion_auto_tool_mode = true
+                                return commit_system_prompt ..
+                                           [[commit changes in the current revision. 
 
 I have asked you to commit it, you don't need to ask for permission again]]
-                        end
+                            end
+                        }
                     }
-                }
-            },
-            ["Commit Message"] = {
-                adapter = "gemini_flash",
-                strategy = "chat",
-                description = "Suggest a commit message based on the diff",
-                opts = {
-                    index = 3,
-                    short_name = "cm",
-                    auto_submit = true,
-                    user_prompt = false
                 },
-                prompts = {
-                    {
-                        role = constants.SYSTEM_ROLE,
-                        content = commit_system_prompt,
-                        opts = {visible = false}
-                    }, {
-                        role = constants.USER_ROLE,
-                        content = commit_system_prompt ..
-                            "Suggent a commit message based on the diff. DO NOT COMMIT THE REVISION."
-                    }
-                }
-            },
-            ["Agent"] = {
-                strategy = "workflow",
-                description = "Use a workflow to repeatedly edit then test code",
-                opts = {index = 1, short_name = "a"},
-                prompts = {
-                    {
+                ["Commit Message"] = {
+                    adapter = "gemini_flash",
+                    strategy = "chat",
+                    description = "Suggest a commit message based on the diff",
+                    opts = {
+                        index = 3,
+                        short_name = "cm",
+                        auto_submit = true,
+                        user_prompt = false
+                    },
+                    prompts = {
                         {
-                            name = "Setup Test",
+                            role = constants.SYSTEM_ROLE,
+                            content = commit_system_prompt,
+                            opts = {visible = false}
+                        }, {
                             role = constants.USER_ROLE,
-                            opts = {auto_submit = false},
-                            content = function()
-                                -- Enable turbo mode!!!
-                                vim.g.codecompanion_auto_tool_mode = true
+                            content = commit_system_prompt ..
+                                "Suggent a commit message based on the diff. DO NOT COMMIT THE REVISION."
+                        }
+                    }
+                },
+                ["Agent"] = {
+                    strategy = "workflow",
+                    description = "Use a workflow to repeatedly edit then test code",
+                    opts = {index = 1, short_name = "a"},
+                    prompts = {
+                        {
+                            {
+                                name = "Setup Test",
+                                role = constants.USER_ROLE,
+                                opts = {auto_submit = false},
+                                content = function()
+                                    -- Enable turbo mode!!!
+                                    vim.g.codecompanion_auto_tool_mode = true
 
-                                -- Get merged AI config
-                                local config = get_merged_ai_config()
+                                    -- Get merged AI config
+                                    local config = get_merged_ai_config()
 
-                                -- Extract test_cmd with fallback
-                                local test_cmd = config.test_cmd or ""
+                                    -- Extract test_cmd with fallback
+                                    local test_cmd = config.test_cmd or ""
 
-                                local step_header =
-                                    "You are required to write code following the instructions provided below"
-                                if test_cmd ~= "" then
-                                    step_header = step_header ..
-                                                      " and test the correctness by running the designated test suite"
-                                end
-                                step_header = step_header .. "."
+                                    local step_header =
+                                        "You are required to write code following the instructions provided below"
+                                    if test_cmd ~= "" then
+                                        step_header = step_header ..
+                                                          " and test the correctness by running the designated test suite"
+                                    end
+                                    step_header = step_header .. "."
 
-                                local steps_content =
-                                    [[### Steps to Follow
+                                    local steps_content =
+                                        [[### Steps to Follow
 
 ]] .. step_header .. [[ Follow these steps exactly:
 
@@ -299,23 +337,24 @@ I have asked you to commit it, you don't need to ask for permission again]]
 3. Update the code in the project using the mcp tool
 ]]
 
-                                local test_steps = ""
-                                if test_cmd ~= "" then
-                                    test_steps = string.format(
-                                                     [[4. Then use the @{cmd_runner} tool to run the test suite with `%s` (do this after you have updated the code)
+                                    local test_steps = ""
+                                    if test_cmd ~= "" then
+                                        test_steps = string.format(
+                                                         [[4. Then use the @{cmd_runner} tool to run the test suite with `%s` (do this after you have updated the code)
 5. Make sure you trigger both tools in the same response
 ]], test_cmd)
-                                end
+                                    end
 
-                                local repeat_step = ""
-                                if test_cmd ~= "" then
-                                    repeat_step =
-                                        "We\'ll repeat this cycle until the requirements is met. "
-                                end
+                                    local repeat_step = ""
+                                    if test_cmd ~= "" then
+                                        repeat_step =
+                                            "We\'ll repeat this cycle until the requirements is met. "
+                                    end
 
-                                return steps_content .. test_steps .. "\n\n" ..
-                                           repeat_step ..
-                                           [[Ensure no deviations from these steps.
+                                    return
+                                        steps_content .. test_steps .. "\n\n" ..
+                                            repeat_step ..
+                                            [[Ensure no deviations from these steps.
 
 Hints:
 - Always read the file using mcp tool before making any changes to make sure you edit the file correctly. 
@@ -324,35 +363,37 @@ Hints:
 ### Instructions
 
 Your instructions here]]
-                            end
-                        }
-                    }, {
-                        {
-                            name = "Repeat On Failure",
-                            role = constants.USER_ROLE,
-                            opts = {auto_submit = true},
-                            -- Scope this prompt to the cmd_runner tool
-                            condition = function()
-                                return _G.codecompanion_current_tool ==
-                                           "cmd_runner"
-                            end,
-                            -- Repeat until the tests pass, as indicated by the testing flag
-                            -- which the cmd_runner tool sets on the chat buffer
-                            repeat_until = function(chat)
-                                return chat.tools.flags.testing == true
-                            end,
-                            content = "The tests have failed. try again"
+                                end
+                            }
+                        }, {
+                            {
+                                name = "Repeat On Failure",
+                                role = constants.USER_ROLE,
+                                opts = {auto_submit = true},
+                                -- Scope this prompt to the cmd_runner tool
+                                condition = function()
+                                    return
+                                        _G.codecompanion_current_tool ==
+                                            "cmd_runner"
+                                end,
+                                -- Repeat until the tests pass, as indicated by the testing flag
+                                -- which the cmd_runner tool sets on the chat buffer
+                                repeat_until = function(chat)
+                                    return chat.tools.flags.testing == true
+                                end,
+                                content = "The tests have failed. try again"
+                            }
                         }
                     }
                 }
+            },
+            display = {
+                action_palette = {opts = {show_default_prompt_library = false}},
+                chat = {show_settings = true, show_tool_processing = true},
+                diff = {enabled = true}
             }
-        },
-        display = {
-            action_palette = {opts = {show_default_prompt_library = false}},
-            chat = {show_settings = true, show_tool_processing = true},
-            diff = {enabled = true}
-        }
-    },
+        })
+    end,
 
     keys = {
         {"<leader>fr", "<cmd>CodeCompanionAction<cr>", desc = "Find Files"},
