@@ -10,6 +10,7 @@ local commit_system_prompt =
   - if the repository is a Jujutsu (jj) repository:
     - use revision '..@' to for the log message
     - use builtin_log_detailed as the template
+    - use `jj desc`. DO NOT USE `jj commit`
 - You should make the title and body as clear and simple as possible. You should look at the project diff using mcp to understand what changes
 - You should add both title and body 
 - You SHOULD NOT adding reasons for the changes on the commit message. Only add the description of the changes.
