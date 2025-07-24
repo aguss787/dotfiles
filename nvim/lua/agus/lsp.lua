@@ -85,16 +85,12 @@ vim.api.nvim_create_autocmd("LspAttach", {
         -- if vim.lsp.inlay_hint then
         -- 	vim.lsp.inlay_hint.enable(true, { ev.buf })
         -- end
-        local client = vim.lsp.get_client_by_id(ev.data.client_id)
-        ---@diagnostic disable-next-line: need-check-nil
-        if client.supports_method("textDocument/inlayHint") then
-            vim.lsp.inlay_hint.enable(true, {bufnr = ev.buf})
-            vim.keymap.set("n", "<leader>i", function()
-                vim.lsp.inlay_hint.enable(
-                    not vim.lsp.inlay_hint.is_enabled({bufnr = ev.buf}),
-                    {bufnr = ev.buf})
-            end, {buffer = ev.buf})
-        end
+
+        -- delete default mappings
+        vim.keymap.del("n", "grr");
+        vim.keymap.del("n", "gri");
+        vim.keymap.del("n", "grn");
+        vim.keymap.del("n", "gra");
 
         vim.keymap.set("n", "gD", vim.lsp.buf.declaration,
                        {buffer = ev.buf, desc = "Go to declaration"})
