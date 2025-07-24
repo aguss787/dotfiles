@@ -52,3 +52,36 @@ following script as `xdg-open` in your `$PATH`:
 
 echo "$1" >> $HOME/.xdg-open.log
 ```
+
+## CodeCompanion Configuration
+
+The `codecompanion.nvim` plugin uses a `.ai.json` configuration file to customize its behavior. This
+file can be placed in two locations:
+
+- `~/.ai.json`: For global configurations that apply to all projects.
+- `<project_root>/.ai.json`: For project-specific configurations.
+
+Project-specific configurations will override global configurations if the same keys are present in
+both files.
+
+### Available Configuration Fields
+
+- `test_cmd`: (Optional) A string specifying the command to run your project's test suite.
+  CodeCompanion will use this command when running agents in "Agent" mode to verify changes.
+  Example: `"npm test"` or `"go test ./..."`
+- `rules`: (Optional) An array of strings, where each string is a rule that the LLM should follow.
+  These rules are prepended to the system prompt for CodeCompanion's prompts, ensuring the LLM
+  adheres to them. Example:
+  `["Always use Conventional Commits", "Never refactor existing code unless explicitly asked"]`
+
+### Example `.ai.json`
+
+```json
+{
+  "test_cmd": "npm test",
+  "rules": [
+    "Always use TypeScript for new files",
+    "Ensure all public functions have JSDoc comments"
+  ]
+}
+```
