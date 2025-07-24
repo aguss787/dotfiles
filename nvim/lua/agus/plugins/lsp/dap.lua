@@ -289,6 +289,7 @@ return {
                 name = "Test",
                 type = "lldb",
                 request = "launch",
+                sourceLanguages = {"rust"},
                 program = function()
                     -- Simply return the nvim-debug binary path
                     return get_target_path()
