@@ -417,6 +417,14 @@ Your instructions here]]
             "<cmd>CodeCompanionChat gemini_pro<cr>",
             desc = "New Chat (Gemini Pro)"
         }, {
+            "<leader>rd",
+            "<cmd>CodeCompanionChat claude<cr>",
+            desc = "New Chat (Claude Sonnet 4)"
+        }, {
+            "<leader>rh",
+            "<cmd>CodeCompanionChat claude_haiku<cr>",
+            desc = "New Chat (Claude Haiku)"
+        }, {
             "<leader>rA",
             function() start_agent_prompt("claude_haiku") end,
             desc = "Claude Haiku Agent"
@@ -424,6 +432,10 @@ Your instructions here]]
             "<leader>rg",
             function() start_agent_prompt("gemini_flash") end,
             desc = "Gemini Flash Agent"
+        }, {
+            "<leader>rG",
+            function() start_agent_prompt("gemini_pro") end,
+            desc = "Gemini Pro Agent"
         }
     }
 }
