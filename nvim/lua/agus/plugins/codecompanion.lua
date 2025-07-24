@@ -332,9 +332,9 @@ I have asked you to commit it, you don't need to ask for permission again]]
 
 ]] .. step_header .. [[ Follow these steps exactly:
 
-1. Understand the context by reading #{buffer} and other required files using @mcp
+1. Understand the context. #{buffer} is the active file and other required files can be accessed using mcp.
 2. Plan carefully on how you will fulfill the requirements.
-3. Update the code in the project using the mcp tool
+3. Update the code in the project using the mcp tool.
 ]]
 
                                     local test_steps = ""
