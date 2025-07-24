@@ -281,10 +281,18 @@ I have asked you to commit it, you don't need to ask for permission again]]
                                 -- Extract test_cmd with fallback
                                 local test_cmd = config.test_cmd or ""
 
+                                local step_header =
+                                    "You are required to write code following the instructions provided below"
+                                if test_cmd ~= "" then
+                                    step_header = step_header ..
+                                                      " and test the correctness by running the designated test suite"
+                                end
+                                step_header = step_header .. "."
+
                                 local steps_content =
                                     [[### Steps to Follow
 
-You are required to write code following the instructions provided below and test the correctness by running the designated test suite. Follow these steps exactly:
+]] .. step_header .. [[ Follow these steps exactly:
 
 1. Understand the context by reading #{buffer} and other required files using @mcp
 2. Plan carefully on how you will fulfill the requirements.
@@ -299,9 +307,15 @@ You are required to write code following the instructions provided below and tes
 ]], test_cmd)
                                 end
 
-                                return steps_content .. test_steps .. [[
+                                local repeat_step = ""
+                                if test_cmd ~= "" then
+                                    repeat_step =
+                                        "We\'ll repeat this cycle until the requirements is met. "
+                                end
 
-We\'ll repeat this cycle until the requirements is met. Ensure no deviations from these steps.
+                                return steps_content .. test_steps .. "\n\n" ..
+                                           repeat_step ..
+                                           [[Ensure no deviations from these steps.
 
 Hints:
 - Always read the file using mcp tool before making any changes to make sure you edit the file correctly. 
