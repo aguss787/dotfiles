@@ -1,6 +1,9 @@
 return {
     "folke/noice.nvim",
-    dependencies = {"MunifTanjim/nui.nvim"},
+    dependencies = {
+        "MunifTanjim/nui.nvim",
+        {"folke/snacks.nvim", opts = {picker = {enabled = true}}}
+    },
     event = "VeryLazy",
     opts = {
         lsp = {
