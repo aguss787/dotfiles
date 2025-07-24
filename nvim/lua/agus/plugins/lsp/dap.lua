@@ -295,19 +295,17 @@ return {
                     return get_target_path()
                 end,
                 args = function()
-                    -- First, handle binary selection and copying
-                    -- Function to run cargo nextest and get binary list
-                    local function get_cargo_binaries()
+                    -- Function to get tests and their associated binaries from cargo nextest
+                    local function get_cargo_tests_with_binaries()
                         local cmd = {
                             "cargo", "nextest", "list", "--all-features",
-                            "--list-type", "binaries-only", "--message-format",
-                            "json"
+                            "--message-format", "json"
                         }
 
                         local result, error_msg =
                             run_command_with_output(cmd,
                                                     "Cargo Nextest List Output",
-                                                    "Listing binaries with cargo nextest")
+                                                    "Listing tests with cargo nextest")
 
                         if error_msg then
                             vim.notify(error_msg, vim.log.levels.ERROR)
@@ -330,148 +328,96 @@ return {
                             return {}
                         end
 
-                        -- Extract binary information
-                        local binaries = {}
-                        if json_data["rust-binaries"] then
-                            for binary_key, binary_data in pairs(
-                                                               json_data["rust-binaries"]) do
-                                table.insert(binaries, {
-                                    key = binary_key,
-                                    name = binary_data["binary-name"] or
-                                        binary_key,
-                                    path = binary_data["binary-path"],
-                                    kind = binary_data["kind"] or "unknown"
-                                })
+                        -- Extract test information with associated binaries
+                        local tests_with_binaries = {}
+                        if json_data["rust-suites"] then
+                            for suite_key, suite_data in pairs(
+                                                             json_data["rust-suites"]) do
+                                local binary_info = {
+                                    key = suite_key,
+                                    name = suite_data["binary-name"] or
+                                        suite_key,
+                                    path = suite_data["binary-path"],
+                                    kind = suite_data["kind"] or "unknown"
+                                }
+
+                                if suite_data["testcases"] then
+                                    for test_name, test_data in pairs(
+                                                                    suite_data["testcases"]) do
+                                        if not test_data["ignored"] then
+                                            table.insert(tests_with_binaries, {
+                                                test_name = test_name,
+                                                binary = binary_info
+                                            })
+                                        end
+                                    end
+                                end
                             end
                         end
 
-                        return binaries
+                        return tests_with_binaries
                     end
 
-                    vim.notify("Running cargo nextest command to list binaries",
+                    vim.notify("Running cargo nextest command to list tests",
                                vim.log.levels.INFO)
 
-                    -- Get available binaries
-                    local binaries = get_cargo_binaries()
+                    -- Get available tests with their binaries
+                    local tests_with_binaries = get_cargo_tests_with_binaries()
 
-                    if #binaries == 0 then
-                        vim.notify("No binaries found", vim.log.levels.WARN)
+                    if #tests_with_binaries == 0 then
+                        vim.notify("No tests found", vim.log.levels.WARN)
                         return {"render_test"} -- fallback
                     end
 
-                    -- Sort binaries for better UX
-                    table.sort(binaries,
-                               function(a, b)
-                        return a.name < b.name
+                    -- Sort tests for better UX
+                    table.sort(tests_with_binaries, function(a, b)
+                        return a.test_name < b.test_name
                     end)
 
-                    -- Use telescope picker to select binary
-                    local selected_binary =
-                        create_telescope_picker({
-                            items = binaries,
-                            prompt_title = "Select binary to debug",
-                            display_formatter = function(binary)
-                                return string.format("%s (%s)", binary.name,
-                                                     binary.kind)
-                            end,
-                            auto_select = true,
-                            on_auto_select = function(binary)
-                                vim.notify(string.format(
-                                               "Auto-selecting single binary: %s (%s)",
-                                               binary.name, binary.kind),
-                                           vim.log.levels.INFO)
-                            end
-                        })
-
-                    -- Copy the selected binary to target location
-                    local target_path = get_target_path()
-                    if selected_binary then
-                        local source_path = selected_binary.path
-
-                        -- Ensure target directory exists
-                        local target_dir = vim.fn.fnamemodify(target_path, ":h")
-                        vim.fn.mkdir(target_dir, "p")
-
-                        -- Copy the binary
-                        local copy_cmd =
-                            string.format("cp '%s' '%s'", source_path,
-                                          target_path)
-                        local copy_result = os.execute(copy_cmd)
-
-                        if copy_result == 0 then
-                            vim.notify(string.format(
-                                           "Copied binary '%s' to debug target",
-                                           selected_binary.name),
-                                       vim.log.levels.INFO)
-                        else
-                            vim.notify(string.format(
-                                           "Failed to copy binary '%s'",
-                                           selected_binary.name),
-                                       vim.log.levels.ERROR)
-                            return {"render_test"} -- fallback
-                        end
-                    end
-
-                    -- Now handle test selection
-                    -- Function to run nvim-debug --list and get test list
-                    local function get_cargo_tests()
-                        local cmd = {target_path, "--list"}
-
-                        local result, error_msg =
-                            run_command_with_output(cmd,
-                                                    "nvim-debug --list Output",
-                                                    "Listing tests with nvim-debug --list")
-
-                        if error_msg then
-                            vim.notify(error_msg, vim.log.levels.ERROR)
-                            return {}
-                        end
-
-                        if not result or result == "" then
-                            vim.notify("No output from nvim-debug --list",
-                                       vim.log.levels.WARN)
-                            return {}
-                        end
-
-                        -- Parse plain text output
-                        local tests = {}
-                        for line in result:gmatch("[^\n]+") do
-                            -- Look for lines ending with ": test"
-                            local test_name = line:match("^(.+): test$")
-                            if test_name then
-                                table.insert(tests, test_name)
-                            end
-                        end
-
-                        return tests
-                    end
-
-                    vim.notify("Running nvim-debug --list command",
-                               vim.log.levels.INFO)
-
-                    -- Get available tests
-                    local tests = get_cargo_tests()
-
-                    if #tests == 0 then
-                        vim.notify("No tests found", vim.log.levels.WARN)
-                        return {"render_test"} -- fallback to original
-                    end
-
-                    -- Sort tests for better UX
-                    table.sort(tests)
-
                     -- Use telescope picker to select test
-                    local selected_test =
+                    local selected_test_info =
                         create_telescope_picker({
-                            items = tests,
-                            prompt_title = "Select test to debug"
+                            items = tests_with_binaries,
+                            prompt_title = "Select test to debug",
+                            display_formatter = function(test_info)
+                                return
+                                    string.format("%s (%s)",
+                                                  test_info.test_name,
+                                                  test_info.binary.name)
+                            end
                         })
 
-                    if selected_test then
-                        return {selected_test}
+                    if not selected_test_info then return {} end
+
+                    -- Copy the associated binary to target location
+                    local target_path = get_target_path()
+                    local source_path = selected_test_info.binary.path
+
+                    -- Ensure target directory exists
+                    local target_dir = vim.fn.fnamemodify(target_path, ":h")
+                    vim.fn.mkdir(target_dir, "p")
+
+                    -- Copy the binary
+                    local copy_cmd = string.format("cp '%s' '%s'", source_path,
+                                                   target_path)
+                    local copy_result = os.execute(copy_cmd)
+
+                    if copy_result == 0 then
+                        vim.notify(string.format(
+                                       "Copied binary '%s' for test '%s' to debug target",
+                                       selected_test_info.binary.name,
+                                       selected_test_info.test_name),
+                                   vim.log.levels.INFO)
                     else
-                        return {}
+                        vim.notify(string.format(
+                                       "Failed to copy binary '%s' for test '%s'",
+                                       selected_test_info.binary.name,
+                                       selected_test_info.test_name),
+                                   vim.log.levels.ERROR)
+                        return {"render_test"} -- fallback
                     end
+
+                    return {selected_test_info.test_name}
                 end,
                 cwd = "${workspaceFolder}",
                 stopOnEntry = false
