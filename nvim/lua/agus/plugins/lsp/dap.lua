@@ -486,10 +486,19 @@ return {
             "<leader>ob",
             function() require("dap").toggle_breakpoint() end,
             desc = "Toggle breakpoint"
-        }, {"<leader>or", "<cmd>DapNew<cr>", desc = "Run"},
-        {
+        }, {
+            "<leader>or",
+            function()
+                require("dapui").open()
+                vim.cmd("DapNew")
+            end,
+            desc = "Run"
+        }, {
             "<leader>oR",
-            function() require("dap").run_last() end,
+            function()
+                require("dapui").open()
+                require("dap").run_last()
+            end,
             desc = "Run last"
         },
         {
