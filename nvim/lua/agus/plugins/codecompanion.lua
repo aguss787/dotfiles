@@ -214,7 +214,7 @@ DO NOT VIOLATE THESE RULES AT ANY COST.
                         },
                         schema = {
                             model = {default = "claude-sonnet-4-20250514"},
-                            extended_thinking = {default = false}
+                            extended_thinking = {default = true}
                         }
                     })
                 end,
@@ -228,7 +228,7 @@ DO NOT VIOLATE THESE RULES AT ANY COST.
                         },
                         schema = {
                             model = {default = "claude-3-5-haiku-latest"},
-                            extended_thinking = {default = false}
+                            extended_thinking = {default = true}
                         }
                     })
                 end,
