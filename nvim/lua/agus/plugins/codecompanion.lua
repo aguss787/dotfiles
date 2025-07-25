@@ -31,6 +31,7 @@ local commit_system_prompt =
 - You SHOULD NOT using vague words such as "improve", "enhance", "refine" or "update"
   - This is very important because those words doesn't tell the user what the changes are
   - AGAIN, YOU SHOULD NOT USE VAGUE WORDS such as "improve", "enhance", "refine" or "update"
+- Use `Add` instead of `Introduce`
 - You commit the changes using the commit message if the user asked for it
 ]]
 
