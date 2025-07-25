@@ -249,6 +249,9 @@ local function create_telescope_picker(opts)
     return selected_item
 end
 
+-- Global variable to store the last debugged test
+_G.dap_last_test_info = nil
+
 return {
     "rcarriga/nvim-dap-ui",
     dependencies = {
@@ -284,6 +287,35 @@ return {
             return vim.fn.getcwd() .. "/target/debug/nvim-debug"
         end
 
+        -- Helper function to copy binary for a test
+        local function copy_test_binary(test_info)
+            local target_path = get_target_path()
+            local source_path = test_info.binary.path
+
+            -- Ensure target directory exists
+            local target_dir = vim.fn.fnamemodify(target_path, ":h")
+            vim.fn.mkdir(target_dir, "p")
+
+            -- Copy the binary
+            local copy_cmd = string.format("cp '%s' '%s'", source_path,
+                                           target_path)
+            local copy_result = os.execute(copy_cmd)
+
+            if copy_result == 0 then
+                vim.notify(string.format(
+                               "Copied binary '%s' for test '%s' to debug target",
+                               test_info.binary.name, test_info.test_name),
+                           vim.log.levels.INFO)
+                return true
+            else
+                vim.notify(string.format(
+                               "Failed to copy binary '%s' for test '%s'",
+                               test_info.binary.name, test_info.test_name),
+                           vim.log.levels.ERROR)
+                return false
+            end
+        end
+
         dap.configurations.rust = {
             {
                 name = "Test",
@@ -295,6 +327,23 @@ return {
                     return get_target_path()
                 end,
                 args = function()
+                    -- Check if we have a last test saved and should reuse it
+                    if _G.dap_last_test_info then
+                        vim.notify(string.format(
+                                       "Reusing last debugged test: %s (%s)",
+                                       _G.dap_last_test_info.test_name,
+                                       _G.dap_last_test_info.binary.name),
+                                   vim.log.levels.INFO)
+
+                        -- Copy the associated binary to target location
+                        if copy_test_binary(_G.dap_last_test_info) then
+                            return {_G.dap_last_test_info.test_name}
+                        else
+                            -- Clear the invalid test info and fall through to selection
+                            _G.dap_last_test_info = nil
+                        end
+                    end
+
                     -- Function to get tests and their associated binaries from cargo nextest
                     local function get_cargo_tests_with_binaries()
                         local cmd = {
@@ -365,8 +414,8 @@ return {
                     local tests_with_binaries = get_cargo_tests_with_binaries()
 
                     if #tests_with_binaries == 0 then
-                        vim.notify("No tests found", vim.log.levels.WARN)
-                        return {"render_test"} -- fallback
+                        vim.notify("No tests found", vim.log.levels.ERROR)
+                        error("No tests found to debug")
                     end
 
                     -- Sort tests for better UX
@@ -389,35 +438,19 @@ return {
 
                     if not selected_test_info then return {} end
 
+                    -- Save the selected test info globally for next time
+                    _G.dap_last_test_info = selected_test_info
+
                     -- Copy the associated binary to target location
-                    local target_path = get_target_path()
-                    local source_path = selected_test_info.binary.path
-
-                    -- Ensure target directory exists
-                    local target_dir = vim.fn.fnamemodify(target_path, ":h")
-                    vim.fn.mkdir(target_dir, "p")
-
-                    -- Copy the binary
-                    local copy_cmd = string.format("cp '%s' '%s'", source_path,
-                                                   target_path)
-                    local copy_result = os.execute(copy_cmd)
-
-                    if copy_result == 0 then
-                        vim.notify(string.format(
-                                       "Copied binary '%s' for test '%s' to debug target",
-                                       selected_test_info.binary.name,
-                                       selected_test_info.test_name),
-                                   vim.log.levels.INFO)
+                    if copy_test_binary(selected_test_info) then
+                        return {selected_test_info.test_name}
                     else
-                        vim.notify(string.format(
-                                       "Failed to copy binary '%s' for test '%s'",
-                                       selected_test_info.binary.name,
-                                       selected_test_info.test_name),
-                                   vim.log.levels.ERROR)
-                        return {"render_test"} -- fallback
+                        vim.notify(
+                            "Failed to copy binary for debugging - aborting",
+                            vim.log.levels.ERROR)
+                        error(
+                            "Binary copy failed, cannot proceed with debugging")
                     end
-
-                    return {selected_test_info.test_name}
                 end,
                 cwd = "${workspaceFolder}",
                 stopOnEntry = false
@@ -436,6 +469,10 @@ return {
         }, {
             "<leader>or",
             function()
+                -- Clear the last test info to force test selection
+                _G.dap_last_test_info = nil
+                vim.notify("Starting new debug session - cleared last test",
+                           vim.log.levels.INFO)
                 require("dapui").open()
                 vim.cmd("DapNew")
             end,
