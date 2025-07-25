@@ -75,6 +75,12 @@ yamlls_capabilities.textDocument.foldingRange = {
 }
 vim.lsp.config("yamlls", {capabilities = yamlls_capabilities})
 
+-- delete default mappings
+vim.keymap.del("n", "grr");
+vim.keymap.del("n", "gri");
+vim.keymap.del("n", "grn");
+vim.keymap.del("n", "gra");
+
 vim.api.nvim_create_autocmd("LspAttach", {
     group = vim.api.nvim_create_augroup("LspMappings", {}),
     callback = function(ev)
@@ -85,12 +91,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
         -- if vim.lsp.inlay_hint then
         -- 	vim.lsp.inlay_hint.enable(true, { ev.buf })
         -- end
-
-        -- delete default mappings
-        vim.keymap.del("n", "grr");
-        vim.keymap.del("n", "gri");
-        vim.keymap.del("n", "grn");
-        vim.keymap.del("n", "gra");
 
         vim.keymap.set("n", "gD", vim.lsp.buf.declaration,
                        {buffer = ev.buf, desc = "Go to declaration"})
