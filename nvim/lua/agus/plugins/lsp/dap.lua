@@ -327,23 +327,6 @@ return {
                     return get_target_path()
                 end,
                 args = function()
-                    -- Check if we have a last test saved and should reuse it
-                    if _G.dap_last_test_info then
-                        vim.notify(string.format(
-                                       "Reusing last debugged test: %s (%s)",
-                                       _G.dap_last_test_info.test_name,
-                                       _G.dap_last_test_info.binary.name),
-                                   vim.log.levels.INFO)
-
-                        -- Copy the associated binary to target location
-                        if copy_test_binary(_G.dap_last_test_info) then
-                            return {_G.dap_last_test_info.test_name}
-                        else
-                            -- Clear the invalid test info and fall through to selection
-                            _G.dap_last_test_info = nil
-                        end
-                    end
-
                     -- Function to get tests and their associated binaries from cargo nextest
                     local function get_cargo_tests_with_binaries()
                         local cmd = {
@@ -410,7 +393,7 @@ return {
                     vim.notify("Running cargo nextest command to list tests",
                                vim.log.levels.INFO)
 
-                    -- Get available tests with their binaries
+                    -- Always get the latest available tests with their binaries
                     local tests_with_binaries = get_cargo_tests_with_binaries()
 
                     if #tests_with_binaries == 0 then
@@ -423,18 +406,48 @@ return {
                         return a.test_name < b.test_name
                     end)
 
-                    -- Use telescope picker to select test
-                    local selected_test_info =
-                        create_telescope_picker({
-                            items = tests_with_binaries,
-                            prompt_title = "Select test to debug",
-                            display_formatter = function(test_info)
-                                return
-                                    string.format("%s (%s)",
-                                                  test_info.test_name,
-                                                  test_info.binary.name)
+                    local selected_test_info = nil
+
+                    -- Check if we have a last test saved and should reuse it
+                    if _G.dap_last_test_info then
+                        -- Find the matching test in the fresh results using latest binary
+                        for _, test_info in ipairs(tests_with_binaries) do
+                            if test_info.test_name ==
+                                _G.dap_last_test_info.test_name then
+                                selected_test_info = test_info
+                                vim.notify(string.format(
+                                               "Reusing last debugged test: %s (%s) with latest binary",
+                                               selected_test_info.test_name,
+                                               selected_test_info.binary.name),
+                                           vim.log.levels.INFO)
+                                break
                             end
-                        })
+                        end
+
+                        -- If the last test is not found in current results, clear it and proceed with selection
+                        if not selected_test_info then
+                            vim.notify(string.format(
+                                           "Last debugged test '%s' not found in current test list, will prompt for selection",
+                                           _G.dap_last_test_info.test_name),
+                                       vim.log.levels.WARN)
+                            _G.dap_last_test_info = nil
+                        end
+                    end
+
+                    -- If no test was auto-selected, use telescope picker to select test
+                    if not selected_test_info then
+                        selected_test_info =
+                            create_telescope_picker({
+                                items = tests_with_binaries,
+                                prompt_title = "Select test to debug",
+                                display_formatter = function(test_info)
+                                    return
+                                        string.format("%s (%s)",
+                                                      test_info.test_name,
+                                                      test_info.binary.name)
+                                end
+                            })
+                    end
 
                     if not selected_test_info then return {} end
 
