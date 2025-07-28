@@ -362,6 +362,8 @@ return {
 
                         -- Extract test information with associated binaries
                         local tests_with_binaries = {}
+                        local full_test_names = {} -- Store full test names to generate prefixes
+
                         if json_data["rust-suites"] then
                             for suite_key, suite_data in pairs(
                                                              json_data["rust-suites"]) do
@@ -377,14 +379,45 @@ return {
                                     for test_name, test_data in pairs(
                                                                     suite_data["testcases"]) do
                                         if not test_data["ignored"] then
-                                            table.insert(tests_with_binaries, {
-                                                test_name = test_name,
-                                                binary = binary_info
+                                            table.insert(full_test_names, {
+                                                test_name, binary_info
                                             })
                                         end
                                     end
                                 end
                             end
+                        end
+
+                        -- Generate prefixes for each test name
+                        local prefix_binary_combinations = {} -- Store unique prefix-binary combinations
+                        for _, test_info in ipairs(full_test_names) do
+                            local test_name = test_info[1]
+                            local binary_info = test_info[2]
+                            local parts = {}
+
+                            -- Split test name by '::' and create prefixes
+                            for part in string.gmatch(test_name, "[^::]+") do
+                                table.insert(parts, part)
+                                local prefix = table.concat(parts, "::")
+
+                                -- Create unique key for prefix-binary combination
+                                local combination_key = prefix .. "|" ..
+                                                            binary_info.key
+
+                                -- Only add if this specific prefix-binary combination doesn't exist
+                                if not prefix_binary_combinations[combination_key] then
+                                    prefix_binary_combinations[combination_key] =
+                                        {
+                                            test_name = prefix,
+                                            binary = binary_info
+                                        }
+                                end
+                            end
+                        end
+
+                        -- Add all unique prefix-binary combinations to the results
+                        for _, prefix_info in pairs(prefix_binary_combinations) do
+                            table.insert(tests_with_binaries, prefix_info)
                         end
 
                         return tests_with_binaries
