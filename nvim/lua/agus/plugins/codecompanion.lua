@@ -289,7 +289,7 @@ DO NOT VIOLATE THESE RULES AT ANY COST.
                             api_key = "cmd:cat ~/.config/codecompanion/anthropic.key | tr -d ' \n'"
                         },
                         schema = {
-                            model = {default = "claude-sonnet-4-20250514"},
+                            model = {default = "claude-sonnet-4-5-20250929"},
                             extended_thinking = {default = true}
                         }
                     })
