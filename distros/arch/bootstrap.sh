@@ -21,6 +21,5 @@ yay -Syyu --noconfirm \
     fzf zoxide ripgrep \
     python3 python-pip \
     tmux htop fastfetch \
-    noto-fonts-cjk noto-fonts-emoji noto-fonts-extra powerline powerline-fonts
-
+    noto-fonts-cjk noto-fonts-emoji noto-fonts-extra powerline powerline-fonts otf-font-awesome ttf-arimo-nerd
 
