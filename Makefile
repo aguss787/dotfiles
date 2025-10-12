@@ -1,4 +1,4 @@
-all: clean wezterm-config ghostty-config nvim-config tmux-config zshrc rofi-config lazygit-config gnupg-config
+all: clean wezterm-config ghostty-config nvim-config tmux-config zshrc rofi-config lazygit-config gnupg-config waybar
 server: nvim-config tmux-config zshrc gnupg-config
 
 wezterm-config:
@@ -40,6 +40,11 @@ gnupg-config:
 	mkdir -p ~/.gnupg
 	ln -s $(shell pwd)/gnupg/gpg.conf ~/.gnupg/gpg.conf
 
+waybar:
+	@echo "Setting up waybar..."
+	mkdir -p ~/.config
+	ln -s $(shell pwd)/waybar ~/.config/waybar
+
 clean:
 	@echo "Cleaning up..."
 	rm -rf ~/.config/nvim
@@ -50,6 +55,7 @@ clean:
 	rm -rf ~/.wezterm.lua
 	rm -rf ~/.config/rofi
 	rm -rf ~/.config/ghostty
+	rm -rf ~/.config/waybar
 
 timestamp = $(shell date +%s)
 
@@ -64,3 +70,4 @@ backup:
 	cp -R ~/.wezterm.lua ~/.dotfiles/backup/$(timestamp)
 	cp -R ~/.config/rofi ~/.dotfiles/backup/$(timestamp)
 	cp -R ~/.config/ghostty ~/.dotfiles/backup/$(timestamp)
+	cp -R ~/.config/waybar ~/.dotfiles/backup/$(timestamp)
