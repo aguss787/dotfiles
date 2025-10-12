@@ -1,4 +1,4 @@
-all: clean wezterm-config ghostty-config nvim-config tmux-config zshrc rofi-config lazygit-config gnupg-config waybar
+all: clean wezterm-config ghostty-config nvim-config tmux-config zshrc rofi-config lazygit-config gnupg-config waybar-config
 server: nvim-config tmux-config zshrc gnupg-config
 
 wezterm-config:
@@ -40,7 +40,7 @@ gnupg-config:
 	mkdir -p ~/.gnupg
 	ln -s $(shell pwd)/gnupg/gpg.conf ~/.gnupg/gpg.conf
 
-waybar:
+waybar-config:
 	@echo "Setting up waybar..."
 	mkdir -p ~/.config
 	ln -s $(shell pwd)/waybar ~/.config/waybar
