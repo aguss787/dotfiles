@@ -1,0 +1,11 @@
+[symlinks]
+"$HOME/.wezterm.lua" = "$PWD/wezterm/.wezterm.lua"
+"$HOME/.config/ghostty" = "$PWD/ghostty"
+"$HOME/.config/nvim" = "$PWD/nvim"
+"$HOME/.tmux.conf" = "$PWD/tmux/.tmux.conf"
+"$HOME/.zshrc" = "$PWD/zsh/.zshrc"
+"$HOME/.config/rofi" = "$PWD/rofi"
+"$HOME/.config/lazygit" = "$PWD/lazygit"
+"$HOME/.gnupg/gpg.conf" = "$PWD/gnupg/gpg.conf"
+"$HOME/.config/waybar" = "$PWD/waybar"
+

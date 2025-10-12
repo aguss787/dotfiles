@@ -26,3 +26,15 @@ make clean
 > [!CAUTION]  
 > Running the clean up command might result in loss of previous configuration. Run backup before
 > cleaning up your configuration.
+
+## Experimental - symkeeper
+
+Using [symkeeper](https://github.com/aguss787/symkeeper) is a cleaner way to manage the symlinks
+rather than using Makefile. The tool is still in its early stages, so this config is marked as
+experimental.
+
+To use it, install `symkeeper` and run the following command:
+
+```bash
+symkeeper sync
+```
