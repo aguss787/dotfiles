@@ -157,6 +157,12 @@ return {
             config = function()
                 local mcphub = require("mcphub")
                 mcphub.setup({
+                    workspace = {
+                        look_for = {
+                            ".mcphub/servers.json", ".vscode/mcp.json",
+                            ".cursor/mcp.json", ".nvim/mcp.json"
+                        }
+                    },
                     auto_approve = true,
                     native_servers = {
                         system_info = {
