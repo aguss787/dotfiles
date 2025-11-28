@@ -455,7 +455,8 @@ Your instructions here]]
                                 -- Repeat until the tests pass, as indicated by the testing flag
                                 -- which the cmd_runner tool sets on the chat buffer
                                 repeat_until = function(chat)
-                                    return chat.tools.flags.testing == true
+                                    return
+                                        chat.tool_registry.flags.testing == true
                                 end,
                                 content = "The tests have failed. try again"
                             }
