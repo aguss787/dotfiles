@@ -5,8 +5,7 @@ vim.lsp.config("rust_analyzer", {
     settings = {
         ["rust-analyzer"] = {
             cargo = {features = "all"},
-            -- Disable clippy
-            checkOnSave = {command = "check"},
+            checkOnSave = true,
             inlayHints = {maxLength = 100}
         }
     }
