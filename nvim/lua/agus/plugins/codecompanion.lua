@@ -303,7 +303,7 @@ DO NOT VIOLATE THESE RULES AT ANY COST.
                             api_key = "cmd:cat ~/.config/codecompanion/anthropic.key | tr -d ' \n'"
                         },
                         schema = {
-                            model = {default = "claude-3-5-haiku-latest"},
+                            model = {default = "claude-haiku-4-5-20251001"},
                             extended_thinking = {default = true}
                         }
                     })
@@ -496,7 +496,7 @@ Your instructions here]]
         }, {
             "<leader>rd",
             "<cmd>CodeCompanionChat claude<cr>",
-            desc = "New Chat (Claude Sonnet 4)"
+            desc = "New Chat (Claude Sonnet)"
         }, {
             "<leader>rh",
             "<cmd>CodeCompanionChat claude_haiku<cr>",
