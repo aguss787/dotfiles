@@ -32,6 +32,9 @@ vim.opt.cursorline = true
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 
+vim.opt.grepprg = "rg --vimgrep"
+vim.opt.grepformat = "%f:%l:%c:%m"
+
 -- Use the system clipboard
 vim.opt.clipboard:append("unnamedplus")
 
