@@ -117,14 +117,14 @@ If the code modifies an existing file or should be placed at a specific location
 If you want the user to decide where to place the code, do not add the file path comment.
 In the code block, use a line comment with '...existing code...' to indicate code that is already present in the file.
 Code block example:
-````languageId
+```languageId
 // filepath: /path/to/file
 // ...existing code...
 { changed code }
 // ...existing code...
 { changed code }
 // ...existing code...
-````
+```
 Ensure line comments use the correct syntax for the programming language (e.g. "#" for Python, "--" for Lua).
 For code blocks use four backticks to start and end.
 Avoid wrapping the whole response in triple backticks.
