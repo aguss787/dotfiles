@@ -314,6 +314,20 @@ DO NOT VIOLATE THESE RULES AT ANY COST.
                         }
                     })
                 end,
+                claude_opus = function()
+                    return require("codecompanion.adapters").extend("anthropic",
+                                                                    {
+                        name = "claude_opus",
+                        formatted_name = "Claude Opus",
+                        env = {
+                            api_key = "cmd:cat ~/.config/codecompanion/anthropic.key | tr -d ' \n'"
+                        },
+                        schema = {
+                            model = {default = "claude-opus-4-1-20250805"},
+                            extended_thinking = {default = true}
+                        }
+                    })
+                end,
                 gemini_pro = function()
                     return require("codecompanion.adapters").extend("gemini", {
                         name = "gemini_pro",
@@ -508,6 +522,10 @@ Your instructions here]]
             "<cmd>CodeCompanionChat claude_haiku<cr>",
             desc = "New Chat (Claude Haiku)"
         }, {
+            "<leader>rp",
+            "<cmd>CodeCompanionChat claude_opus<cr>",
+            desc = "New Chat (Claude Opus)"
+        }, {
             "<leader>rA",
             function() start_agent_prompt("claude_haiku") end,
             desc = "Claude Haiku Agent"
@@ -524,6 +542,10 @@ Your instructions here]]
             "<leader>rx",
             function() start_agent_prompt("grok") end,
             desc = "Grok Agent"
+        }, {
+            "<leader>ro",
+            function() start_agent_prompt("claude_opus") end,
+            desc = "Claude Opus Agent"
         }
     }
 }
