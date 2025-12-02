@@ -152,6 +152,7 @@ return {
         "nvim-lua/plenary.nvim", "nvim-treesitter/nvim-treesitter",
         "folke/noice.nvim", "OXY2DEV/markview.nvim", {
             "ravitemer/mcphub.nvim",
+            enabled = false,
             dependencies = {"nvim-lua/plenary.nvim"},
             build = "npm install -g mcp-hub@latest", -- Installs `mcp-hub` node binary globally
             config = function()
@@ -234,14 +235,14 @@ DO NOT VIOLATE THESE RULES AT ANY COST.
                 system_prompt = system_prompt
             },
             extensions = {
-                mcphub = {
-                    callback = "mcphub.extensions.codecompanion",
-                    opts = {
-                        make_vars = true,
-                        make_slash_commands = true,
-                        show_result_in_chat = true
-                    }
-                }
+                -- mcphub = {
+                --     callback = "mcphub.extensions.codecompanion",
+                --     opts = {
+                --         make_vars = true,
+                --         make_slash_commands = true,
+                --         show_result_in_chat = true
+                --     }
+                -- }
             },
             strategies = {
                 chat = {
@@ -251,7 +252,8 @@ DO NOT VIOLATE THESE RULES AT ANY COST.
                             auto_submit_errors = true,
                             auto_submit_success = true,
                             default_tools = {
-                                "use_mcp_tool", "access_mcp_resource", "mcp"
+                                "full_stack_dev"
+                                -- "use_mcp_tool", "access_mcp_resource", "mcp"
                             }
                         }
                     }
