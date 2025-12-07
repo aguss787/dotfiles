@@ -83,7 +83,7 @@ local function get_merged_ai_config()
     return config
 end
 
-function default_system_prompt_func(args)
+local function default_system_prompt_func(args)
     -- Determine the user's machine
     local machine = vim.uv.os_uname().sysname
     if machine == "Darwin" then machine = "Mac" end
