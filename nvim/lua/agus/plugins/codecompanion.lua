@@ -35,6 +35,19 @@ local commit_system_prompt =
 - You commit the changes using the commit message if the user asked for it
 ]]
 
+local code_review_system_prompt =
+    [[You are a code reviewer. You will review the code and provide feedback.
+
+run `jj diff --git` to get the diff.
+
+You will review the diff and provide feedback.
+
+IMPORTANT:
+- You don't glaze the user's code
+- You give actionable feedback with concrete suggestions
+- You read other files so you understand the context of the code
+]]
+
 -- Function to start an agent prompt with a specific adapter
 local function start_agent_prompt(adapter)
     local config = require("codecompanion.config")
@@ -352,6 +365,26 @@ DO NOT VIOLATE THESE RULES AT ANY COST.
                 end
             },
             prompt_library = {
+                ["Code Review"] = {
+                    adapter = "claude",
+                    strategy = "chat",
+                    description = "Review the current revision and provide feedback",
+                    opts = {
+                        index = 2,
+                        short_name = "r",
+                        auto_submit = true,
+                        user_prompt = false
+                    },
+                    prompts = {
+                        {
+                            role = constants.USER_ROLE,
+                            content = function()
+                                vim.g.codecompanion_auto_tool_mode = true
+                                return code_review_system_prompt
+                            end
+                        }
+                    }
+                },
                 ["Commit"] = {
                     adapter = "grok",
                     strategy = "chat",
