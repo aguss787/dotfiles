@@ -1,7 +1,9 @@
 local constants = {LLM_ROLE = "llm", USER_ROLE = "user", SYSTEM_ROLE = "system"}
 local commit_system_prompt =
-    [[You will commit the code changes for the user. Follow these rules:
+    [[@{cmd_runner} You will commit the code changes for the user. Follow these rules:
 
+- Use `jj` if the repository is a Jujutsu (jj) repository
+- Use `jj diff --git` to get the diff
 - You never ask the user for information
 - You should get all the necessary information from the mcp servers
 - You should understand that the working directory is #{system://cwd}
@@ -36,7 +38,7 @@ local commit_system_prompt =
 ]]
 
 local code_review_system_prompt =
-    [[You are a code reviewer. You will review the code and provide feedback.
+    [[@{dev} You are a code reviewer. You will review the code and provide feedback.
 
 run `jj diff --git` to get the diff.
 
@@ -123,9 +125,9 @@ All non-code text responses must be written in the %s language.
 Use Markdown formatting in your answers.
 Do not use H1 or H2 markdown headers.
 When suggesting code changes or new content, use Markdown code blocks.
-To start a code block, use 4 backticks.
+To start a code block, use 3 backticks.
 After the backticks, add the programming language name as the language ID.
-To close a code block, use 4 backticks on a new line.
+To close a code block, use 3 backticks on a new line.
 If the code modifies an existing file or should be placed at a specific location, add a line comment with 'filepath:' and the file path.
 If you want the user to decide where to place the code, do not add the file path comment.
 In the code block, use a line comment with '...existing code...' to indicate code that is already present in the file.
@@ -152,8 +154,8 @@ When given a task:
 Additional context:
 The current date is %s.
 The user's Neovim version is %s.
-The user is working on a %s machine. Please respond with system specific commands if applicable.]],
-               args.language or "English", os.date("%B %d, %Y"),
+The user is working on a %s machine. Please respond with system specific commands if applicable.
+]], args.language or "English", os.date("%B %d, %Y"),
                vim.version().major .. "." .. vim.version().minor .. "." ..
                    vim.version().patch, machine)
 end
@@ -259,20 +261,33 @@ DO NOT VIOLATE THESE RULES AT ANY COST.
             },
             strategies = {
                 chat = {
-                    adapter = "claude",
+                    adapter = "claude_haiku",
                     tools = {
+                        groups = {
+                            ["dev"] = {
+                                description = "Full Stack Developer - Can run code, edit code and modify files",
+                                prompt = "I'm giving you access to the ${tools} to help you perform coding tasks. Memory tools are super important",
+                                tools = {
+                                    "cmd_runner", "create_file", "delete_file",
+                                    "file_search", "get_changed_files",
+                                    "grep_search", "insert_edit_into_file",
+                                    "list_code_usages", "read_file", "memory"
+                                },
+                                opts = {collapse_tools = true}
+                            }
+                        },
+
+                        ["memory"] = {opts = {requires_approval = false}},
                         opts = {
-                            auto_submit_errors = true,
-                            auto_submit_success = true,
                             default_tools = {
-                                "full_stack_dev"
+                                -- "full_stack_dev"
                                 -- "use_mcp_tool", "access_mcp_resource", "mcp"
                             }
                         }
                     }
                 },
                 inline = {
-                    adapter = "claude",
+                    adapter = "claude_haiku",
                     keymaps = {
                         accept_change = {
                             modes = {n = "ga"},
@@ -285,7 +300,7 @@ DO NOT VIOLATE THESE RULES AT ANY COST.
                     }
 
                 },
-                cmd = {adapter = "claude"}
+                cmd = {adapter = "claude_haiku"}
             },
             adapters = {
                 opts = {show_defaults = false},
@@ -301,11 +316,11 @@ DO NOT VIOLATE THESE RULES AT ANY COST.
                         schema = {model = {default = "grok-4-fast-reasoning"}}
                     })
                 end,
-                claude = function()
+                claude_sonnet = function()
                     return require("codecompanion.adapters").extend("anthropic",
                                                                     {
-                        name = "claude",
-                        formatted_name = "Claude",
+                        name = "claude_sonnet",
+                        formatted_name = "Claude Sonnet",
                         env = {
                             api_key = "cmd:cat ~/.config/codecompanion/anthropic.key | tr -d ' \n'"
                         },
@@ -319,7 +334,7 @@ DO NOT VIOLATE THESE RULES AT ANY COST.
                     return require("codecompanion.adapters").extend("anthropic",
                                                                     {
                         name = "claude_haiku",
-                        formatted_name = "Claude",
+                        formatted_name = "Claude Haiku",
                         env = {
                             api_key = "cmd:cat ~/.config/codecompanion/anthropic.key | tr -d ' \n'"
                         },
@@ -366,7 +381,7 @@ DO NOT VIOLATE THESE RULES AT ANY COST.
             },
             prompt_library = {
                 ["Code Review"] = {
-                    adapter = "claude",
+                    adapter = "claude_haiku",
                     strategy = "chat",
                     description = "Review the current revision and provide feedback",
                     opts = {
@@ -386,7 +401,7 @@ DO NOT VIOLATE THESE RULES AT ANY COST.
                     }
                 },
                 ["Commit"] = {
-                    adapter = "grok",
+                    adapter = "claude_haiku",
                     strategy = "chat",
                     description = "Commit changes in the current revision",
                     opts = {
@@ -409,7 +424,7 @@ I have asked you to commit it, you don't need to ask for permission again]]
                     }
                 },
                 ["Commit Message"] = {
-                    adapter = "grok",
+                    adapter = "claude_haiku",
                     strategy = "chat",
                     description = "Suggest a commit message based on the diff",
                     opts = {
@@ -451,7 +466,7 @@ I have asked you to commit it, you don't need to ask for permission again]]
                                     local test_cmd = config.test_cmd or ""
 
                                     local step_header =
-                                        "You are required to write code following the instructions provided below"
+                                        "@{dev} You are required to write code following the instructions provided below"
                                     if test_cmd ~= "" then
                                         step_header = step_header ..
                                                           " and test the correctness by running the designated test suite"
@@ -465,16 +480,20 @@ I have asked you to commit it, you don't need to ask for permission again]]
 
 1. Understand the context. #{buffer} is the active file and other required files can be accessed using mcp.
 2. Plan carefully on how you will fulfill the requirements.
-3. Update the code in the project using the mcp tool.
+3. Update the code in the project.
 ]]
 
                                     local test_steps = ""
                                     if test_cmd ~= "" then
                                         test_steps = string.format(
-                                                         [[4. Then use the @{cmd_runner} tool to run the test suite with `%s` (do this after you have updated the code)
-5. Make sure you trigger both tools in the same response
-]], test_cmd)
+                                                         [[4. Then use the cmd_runner tool to run the test suite with `%s` (do this after you have updated the code)]],
+                                                         test_cmd)
+                                    else
+                                        test_steps =
+                                            [[4. Then use the cmd_runner tool to run the test suite]]
                                     end
+                                    test_steps = test_steps ..
+                                                     "\n5. Make sure you trigger both tools in the same response"
 
                                     local repeat_step = ""
                                     if test_cmd ~= "" then
@@ -528,55 +547,36 @@ Your instructions here]]
     end,
 
     keys = {
-        {"<leader>fr", "<cmd>CodeCompanionAction<cr>", desc = "Find Files"},
-        {"<leader>ra", "<cmd>CodeCompanion /a<cr>", desc = "Agent"},
-        {"<leader>rC", "<cmd>CodeCompanion /c<cr>", desc = "Commit"},
-        {
-            "<leader>rc",
-            "<cmd>CodeCompanion /cm<cr>",
-            desc = "Suggest commit message"
-        },
         {
             "<leader>rr",
             "<cmd>CodeCompanionChat toggle<cr>",
             desc = "Toggle chat"
-        }, {
-            "<leader>rf",
-            "<cmd>CodeCompanionChat grok<cr>",
-            desc = "New Chat (Gemini Flash)"
-        }, {
-            "<leader>rs",
-            "<cmd>CodeCompanionChat gemini_pro<cr>",
-            desc = "New Chat (Gemini Pro)"
+        },
+        {
+            "<leader>fr",
+            "<cmd>CodeCompanionAction<cr>",
+            desc = "Code Companion Actions"
+        }, {"<leader>rC", "<cmd>CodeCompanion /c<cr>", desc = "Commit"},
+        {
+            "<leader>rc",
+            "<cmd>CodeCompanion /cm<cr>",
+            desc = "Suggest commit message"
         }, {
             "<leader>rd",
-            "<cmd>CodeCompanionChat claude<cr>",
+            "<cmd>CodeCompanionChat claude_sonnet<cr>",
             desc = "New Chat (Claude Sonnet)"
         }, {
-            "<leader>rh",
+            "<leader>rf",
             "<cmd>CodeCompanionChat claude_haiku<cr>",
             desc = "New Chat (Claude Haiku)"
         }, {
-            "<leader>rp",
-            "<cmd>CodeCompanionChat claude_opus<cr>",
-            desc = "New Chat (Claude Opus)"
-        }, {
-            "<leader>rA",
+            "<leader>ra",
             function() start_agent_prompt("claude_haiku") end,
             desc = "Claude Haiku Agent"
         }, {
-            "<leader>rg",
-            function() start_agent_prompt("gemini_flash") end,
-            desc = "Gemini Flash Agent"
-        }, {
-            "<leader>rG",
-            function() start_agent_prompt("gemini_pro") end,
-            desc = "Gemini Pro Agent"
-        },
-        {
-            "<leader>rx",
-            function() start_agent_prompt("grok") end,
-            desc = "Grok Agent"
+            "<leader>rA",
+            function() start_agent_prompt("claude_sonnet") end,
+            desc = "Claude Sonnet Agent"
         }, {
             "<leader>ro",
             function() start_agent_prompt("claude_opus") end,
