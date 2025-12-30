@@ -353,7 +353,7 @@ DO NOT VIOLATE THESE RULES AT ANY COST.
                             api_key = "cmd:cat ~/.config/codecompanion/anthropic.key | tr -d ' \n'"
                         },
                         schema = {
-                            model = {default = "claude-opus-4-1-20250805"},
+                            model = {default = "claude-opus-4-5-20251101"},
                             extended_thinking = {default = true}
                         }
                     })
@@ -532,15 +532,44 @@ Your instructions here]]
                                     return
                                         chat.tool_registry.flags.testing == true
                                 end,
-                                content = "The tests have failed. try again"
+                                content = "Make sure the code works"
                             }
+                        }
+                    }
+                },
+                ["plan"] = {
+                    adapter = "claude_sonnet",
+                    strategy = "chat",
+                    description = "Plan changes",
+                    opts = {index = 1, short_name = "p"},
+                    prompts = {
+                        {
+                            role = constants.USER_ROLE,
+                            content = [[@{dev} Write a plan and todos for the following task. write them as detail as possible. Store your plan and todos in your memory.
+
+Task:
+]],
+                            opts = {visible = true}
+                        }
+                    }
+                },
+                ["execute-plan"] = {
+                    adapter = "claude_sonnet",
+                    strategy = "chat",
+                    description = "Execute plan in memory",
+                    opts = {index = 1, short_name = "xp", auto_submit = true},
+                    prompts = {
+                        {
+                            role = constants.USER_ROLE,
+                            content = [[@{dev} Execute the todo in your memory.]],
+                            opts = {visible = true}
                         }
                     }
                 }
             },
             display = {
                 action_palette = {opts = {show_default_prompt_library = false}},
-                chat = {show_settings = true, show_tool_processing = true},
+                chat = {show_tool_processing = true},
                 diff = {enabled = true}
             }
         })
@@ -581,6 +610,16 @@ Your instructions here]]
             "<leader>ro",
             function() start_agent_prompt("claude_opus") end,
             desc = "Claude Opus Agent"
+        },
+        {
+            "<leader>rp",
+            "<cmd>CodeCompanion /p<cr>",
+            desc = "Claude Sonnet Planner"
+        },
+        {
+            "<leader>rx",
+            "<cmd>CodeCompanion /xp<cr>",
+            desc = "Claude Sonnet Planner"
         }
     }
 }
