@@ -278,19 +278,23 @@ DO NOT VIOLATE THESE RULES AT ANY COST.
                                 prompt = [[ I'm giving you access to the ${tools} to help you perform coding tasks. 
 
 Memory tools are super important, and you have to be organized with it. Use the following structure to organize your though:
-  - README.md
-  - knowledge_base/
+  - README.md # contains the summary of the project, current active task, etc
+  - knowledge_base/ # contains all knowledge tree about the project
     - topic.md
     - topic/
       - subtopic.md
-  - task/
+  - task/ # contains all task summaries that you have to do
     - 0001-task-name.md
     - 0002-task-name.md
     - ...
-  - plan/
+  - plan/ # contains the detailed plan for each task
     - 0001-plan-name.md
     - 0002-plan-name.md
     - ...
+
+<<IMPORANT>>
+Consult the knowledge base if you have any questions. If the knowledge base doesn't have the answer, or it's outdated, update it.
+<<IMPORANT SECTION END>>
 ]],
                                 tools = {
                                     "cmd_runner", "create_file", "delete_file",
@@ -570,11 +574,11 @@ Task:
                     adapter = "claude_sonnet",
                     strategy = "chat",
                     description = "Execute plan in memory",
-                    opts = {index = 1, short_name = "xp", auto_submit = false},
+                    opts = {index = 1, short_name = "xp", auto_submit = true},
                     prompts = {
                         {
                             role = constants.USER_ROLE,
-                            content = [[@{dev} Execute the todo of <task>]],
+                            content = [[@{dev} Execute the current task]],
                             opts = {visible = true}
                         }
                     }
