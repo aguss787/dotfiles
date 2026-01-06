@@ -98,6 +98,15 @@ local function get_merged_ai_config()
     return config
 end
 
+-- Helper function to generate API key command
+--- @param service_name string The name of the service (e.g., "anthropic", "gemini", "grok")
+--- @return string The command string to read and clean the API key
+local function get_api_key_cmd(service_name)
+    return string.format(
+               "cmd:cat ~/.config/codecompanion/%s.key | tr -d ' \\n'",
+               service_name)
+end
+
 local function default_system_prompt_func(args)
     -- Determine the user's machine
     local machine = vim.uv.os_uname().sysname
@@ -266,7 +275,23 @@ DO NOT VIOLATE THESE RULES AT ANY COST.
                         groups = {
                             ["dev"] = {
                                 description = "Full Stack Developer - Can run code, edit code and modify files",
-                                prompt = "I'm giving you access to the ${tools} to help you perform coding tasks. Memory tools are super important",
+                                prompt = [[ I'm giving you access to the ${tools} to help you perform coding tasks. 
+
+Memory tools are super important, and you have to be organized with it. Use the following structure to organize your though:
+  - README.md
+  - knowledge_base/
+    - topic.md
+    - topic/
+      - subtopic.md
+  - task/
+    - 0001-task-name.md
+    - 0002-task-name.md
+    - ...
+  - plan/
+    - 0001-plan-name.md
+    - 0002-plan-name.md
+    - ...
+]],
                                 tools = {
                                     "cmd_runner", "create_file", "delete_file",
                                     "file_search", "get_changed_files",
@@ -309,9 +334,7 @@ DO NOT VIOLATE THESE RULES AT ANY COST.
                         name = "grok",
                         formatted_name = "Grok",
                         url = "https://api.x.ai/v1/chat/completions",
-                        env = {
-                            api_key = "cmd:cat ~/.config/codecompanion/grok.key | tr -d ' \n'"
-                        },
+                        env = {api_key = get_api_key_cmd("grok")},
                         opts = {stream = true, tools = true, vision = true},
                         schema = {model = {default = "grok-4-fast-reasoning"}}
                     })
@@ -321,9 +344,7 @@ DO NOT VIOLATE THESE RULES AT ANY COST.
                                                                     {
                         name = "claude_sonnet",
                         formatted_name = "Claude Sonnet",
-                        env = {
-                            api_key = "cmd:cat ~/.config/codecompanion/anthropic.key | tr -d ' \n'"
-                        },
+                        env = {api_key = get_api_key_cmd("anthropic")},
                         schema = {
                             model = {default = "claude-sonnet-4-5-20250929"},
                             extended_thinking = {default = true}
@@ -335,9 +356,7 @@ DO NOT VIOLATE THESE RULES AT ANY COST.
                                                                     {
                         name = "claude_haiku",
                         formatted_name = "Claude Haiku",
-                        env = {
-                            api_key = "cmd:cat ~/.config/codecompanion/anthropic.key | tr -d ' \n'"
-                        },
+                        env = {api_key = get_api_key_cmd("anthropic")},
                         schema = {
                             model = {default = "claude-haiku-4-5-20251001"},
                             extended_thinking = {default = true}
@@ -349,9 +368,7 @@ DO NOT VIOLATE THESE RULES AT ANY COST.
                                                                     {
                         name = "claude_opus",
                         formatted_name = "Claude Opus",
-                        env = {
-                            api_key = "cmd:cat ~/.config/codecompanion/anthropic.key | tr -d ' \n'"
-                        },
+                        env = {api_key = get_api_key_cmd("anthropic")},
                         schema = {
                             model = {default = "claude-opus-4-5-20251101"},
                             extended_thinking = {default = true}
@@ -362,9 +379,7 @@ DO NOT VIOLATE THESE RULES AT ANY COST.
                     return require("codecompanion.adapters").extend("gemini", {
                         name = "gemini_pro",
                         formatted_name = "Gemini Pro",
-                        env = {
-                            api_key = "cmd:cat ~/.config/codecompanion/gemini.key | tr -d ' \n'"
-                        },
+                        env = {api_key = get_api_key_cmd("gemini")},
                         schema = {model = {default = "gemini-2.5-pro"}}
                     })
                 end,
@@ -372,9 +387,7 @@ DO NOT VIOLATE THESE RULES AT ANY COST.
                     return require("codecompanion.adapters").extend("gemini", {
                         name = "gemini_flash",
                         formatted_name = "Gemini Flash",
-                        env = {
-                            api_key = "cmd:cat ~/.config/codecompanion/gemini.key | tr -d ' \n'"
-                        },
+                        env = {api_key = get_api_key_cmd("gemini")},
                         schema = {model = {default = "gemini-2.5-flash"}}
                     })
                 end
@@ -557,11 +570,11 @@ Task:
                     adapter = "claude_sonnet",
                     strategy = "chat",
                     description = "Execute plan in memory",
-                    opts = {index = 1, short_name = "xp", auto_submit = true},
+                    opts = {index = 1, short_name = "xp", auto_submit = false},
                     prompts = {
                         {
                             role = constants.USER_ROLE,
-                            content = [[@{dev} Execute the todo in your memory.]],
+                            content = [[@{dev} Execute the todo of <task>]],
                             opts = {visible = true}
                         }
                     }
