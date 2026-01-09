@@ -98,6 +98,39 @@ local function get_merged_ai_config()
     return config
 end
 
+--- @class OllamaConfig
+--- @field url string The Ollama server URL
+--- @field model string The model to use
+
+-- Helper function to load ollama config from JSON file (experimental)
+-- Config file: ~/.config/codecompanion/ollama.json
+-- Expected format: { "url": "http://...", "model": "model-name" }
+--- @return OllamaConfig|nil
+local function load_ollama_config()
+    local config_path = vim.fn.expand("~/.config/codecompanion/ollama.json")
+    local file = io.open(config_path, "r")
+    if not file then return nil end
+
+    local content = file:read("*all")
+    file:close()
+
+    local success, config = pcall(vim.fn.json_decode, content)
+    if not success or not config then
+        vim.notify("[CodeCompanion] Failed to parse ollama.json",
+                   vim.log.levels.WARN)
+        return nil
+    end
+
+    if not config.url or not config.model then
+        vim.notify(
+            "[CodeCompanion] ollama.json missing required fields (url, model)",
+            vim.log.levels.WARN)
+        return nil
+    end
+
+    return config
+end
+
 -- Helper function to generate API key command
 --- @param service_name string The name of the service (e.g., "anthropic", "gemini", "grok")
 --- @return string The command string to read and clean the API key
@@ -394,7 +427,24 @@ Consult the knowledge base if you have any questions. If the knowledge base does
                         env = {api_key = get_api_key_cmd("gemini")},
                         schema = {model = {default = "gemini-2.5-flash"}}
                     })
-                end
+                end,
+                -- Ollama adapter (experimental): loaded conditionally from ~/.config/codecompanion/ollama.json
+                ollama = (function()
+                    local ollama_config = load_ollama_config()
+                    if not ollama_config then return nil end
+                    return function()
+                        return require("codecompanion.adapters").extend(
+                                   "ollama", {
+                                name = "ollama",
+                                formatted_name = "Ollama",
+                                env = {url = ollama_config.url},
+                                schema = {
+                                    model = {default = ollama_config.model},
+                                    think = {default = true}
+                                }
+                            })
+                    end
+                end)()
             },
             prompt_library = {
                 ["Code Review"] = {
