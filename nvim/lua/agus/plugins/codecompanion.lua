@@ -2,9 +2,9 @@ local constants = {LLM_ROLE = "llm", USER_ROLE = "user", SYSTEM_ROLE = "system"}
 local commit_system_prompt =
     [[@{cmd_runner} You will commit the code changes for the user. Follow these rules:
 
-- Use `jj` if the repository is a Jujutsu (jj) repository
-- Use `jj diff --git` to get the diff
-- You never ask the user for information
+g Use `jj` if the repository is a Jujutsu (jj) repository
+- Use `jj diff --git --ignore-working-copy` to get the diff
+-gYou never ask the user for information
 - You should get all the necessary information from the mcp servers
 - You should understand that the working directory is #{system://cwd}
 - You have strong bias towards using conventional commit
@@ -40,7 +40,7 @@ local commit_system_prompt =
 local code_review_system_prompt =
     [[@{dev} You are a code reviewer. You will review the code and provide feedback.
 
-run `jj diff --git` to get the diff.
+run `jj diff --git --ignore-working-copy` to get the diff.
 
 You will review the diff and provide feedback.
 
@@ -50,14 +50,25 @@ IMPORTANT:
 - You read other files so you understand the context of the code
 ]]
 
+local context_utils
+local function get_context(bufnr, args)
+    if not context_utils then
+        context_utils = require("codecompanion.utils.context")
+    end
+    return context_utils.get(bufnr, args)
+end
+
 -- Function to start an agent prompt with a specific adapter
 local function start_agent_prompt(adapter)
-    local config = require("codecompanion.config")
-    local original_prompt = config.config.prompt_library["Agent"]
+    local actions = require("codecompanion.actions")
+
+    local context = get_context(vim.api.nvim_get_current_buf(), {})
+    local original_prompt = actions.resolve_from_alias("a", context)
+
     local prompt = vim.deepcopy(original_prompt)
     prompt.adapter = adapter
 
-    require("codecompanion").prompt_library(prompt, {})
+    return actions.resolve(prompt, context)
 end
 
 --- @class AiConfig
@@ -101,10 +112,11 @@ end
 --- @class OllamaConfig
 --- @field url string The Ollama server URL
 --- @field model string The model to use
+--- @field num_ctx number The number of context tokens to use
 
 -- Helper function to load ollama config from JSON file (experimental)
 -- Config file: ~/.config/codecompanion/ollama.json
--- Expected format: { "url": "http://...", "model": "model-name" }
+-- Expected format: { "url": "http://...", "model": "model-name", "num_ctx": 65536 }
 --- @return OllamaConfig|nil
 local function load_ollama_config()
     local config_path = vim.fn.expand("~/.config/codecompanion/ollama.json")
@@ -128,7 +140,17 @@ local function load_ollama_config()
         return nil
     end
 
+    if not config.num_ctx then config.num_ctx = 65536 end
+
     return config
+end
+
+local ollama_config = load_ollama_config()
+
+local function maybe_ollama_if_configured()
+    if ollama_config then return "ollama" end
+
+    return "claude_haiku"
 end
 
 -- Helper function to generate API key command
@@ -326,7 +348,7 @@ Memory tools are super important, and you have to be organized with it. Use the 
     - ...
 
 <<IMPORANT>>
-Consult the knowledge base if you have any questions. If the knowledge base doesn't have the answer, or it's outdated, update it.
+Always read the README.md in your memory before doing anything.
 <<IMPORANT SECTION END>>
 ]],
                                 tools = {
@@ -339,7 +361,7 @@ Consult the knowledge base if you have any questions. If the knowledge base does
                             }
                         },
 
-                        ["memory"] = {opts = {requires_approval = false}},
+                        ["memory"] = {opts = {requires_approval_before = false}},
                         opts = {
                             default_tools = {
                                 -- "full_stack_dev"
@@ -366,94 +388,142 @@ Consult the knowledge base if you have any questions. If the knowledge base does
             },
             adapters = {
                 opts = {show_defaults = false},
-                grok = function()
-                    return require("codecompanion.adapters").extend("gemini", {
-                        name = "grok",
-                        formatted_name = "Grok",
-                        url = "https://api.x.ai/v1/chat/completions",
-                        env = {api_key = get_api_key_cmd("grok")},
-                        opts = {stream = true, tools = true, vision = true},
-                        schema = {model = {default = "grok-4-fast-reasoning"}}
-                    })
-                end,
-                claude_sonnet = function()
-                    return require("codecompanion.adapters").extend("anthropic",
-                                                                    {
-                        name = "claude_sonnet",
-                        formatted_name = "Claude Sonnet",
-                        env = {api_key = get_api_key_cmd("anthropic")},
-                        schema = {
-                            model = {default = "claude-sonnet-4-5-20250929"},
-                            extended_thinking = {default = true}
-                        }
-                    })
-                end,
-                claude_haiku = function()
-                    return require("codecompanion.adapters").extend("anthropic",
-                                                                    {
-                        name = "claude_haiku",
-                        formatted_name = "Claude Haiku",
-                        env = {api_key = get_api_key_cmd("anthropic")},
-                        schema = {
-                            model = {default = "claude-haiku-4-5-20251001"},
-                            extended_thinking = {default = true}
-                        }
-                    })
-                end,
-                claude_opus = function()
-                    return require("codecompanion.adapters").extend("anthropic",
-                                                                    {
-                        name = "claude_opus",
-                        formatted_name = "Claude Opus",
-                        env = {api_key = get_api_key_cmd("anthropic")},
-                        schema = {
-                            model = {default = "claude-opus-4-5-20251101"},
-                            extended_thinking = {default = true}
-                        }
-                    })
-                end,
-                gemini_pro = function()
-                    return require("codecompanion.adapters").extend("gemini", {
-                        name = "gemini_pro",
-                        formatted_name = "Gemini Pro",
-                        env = {api_key = get_api_key_cmd("gemini")},
-                        schema = {model = {default = "gemini-2.5-pro"}}
-                    })
-                end,
-                gemini_flash = function()
-                    return require("codecompanion.adapters").extend("gemini", {
-                        name = "gemini_flash",
-                        formatted_name = "Gemini Flash",
-                        env = {api_key = get_api_key_cmd("gemini")},
-                        schema = {model = {default = "gemini-2.5-flash"}}
-                    })
-                end,
-                -- Ollama adapter (experimental): loaded conditionally from ~/.config/codecompanion/ollama.json
-                ollama = (function()
-                    local ollama_config = load_ollama_config()
-                    if not ollama_config then return nil end
-                    return function()
+                http = {
+                    grok = function()
                         return require("codecompanion.adapters").extend(
-                                   "ollama", {
-                                name = "ollama",
-                                formatted_name = "Ollama",
-                                env = {url = ollama_config.url},
+                                   "gemini", {
+                                name = "grok",
+                                formatted_name = "Grok",
+                                url = "https://api.x.ai/v1/chat/completions",
+                                env = {api_key = get_api_key_cmd("grok")},
+                                opts = {
+                                    stream = true,
+                                    tools = true,
+                                    vision = true
+                                },
                                 schema = {
-                                    model = {default = ollama_config.model},
-                                    think = {default = true}
+                                    model = {default = "grok-4-fast-reasoning"}
                                 }
                             })
-                    end
-                end)()
+                    end,
+                    claude_sonnet = function()
+                        return require("codecompanion.adapters").extend(
+                                   "anthropic", {
+                                name = "claude_sonnet",
+                                formatted_name = "Claude Sonnet",
+                                env = {api_key = get_api_key_cmd("anthropic")},
+                                schema = {
+                                    model = {
+                                        default = "claude-sonnet-4-5-20250929"
+                                    },
+                                    extended_thinking = {default = true}
+                                }
+                            })
+                    end,
+                    claude_haiku = function()
+                        return require("codecompanion.adapters").extend(
+                                   "anthropic", {
+                                name = "claude_haiku",
+                                formatted_name = "Claude Haiku",
+                                env = {api_key = get_api_key_cmd("anthropic")},
+                                schema = {
+                                    model = {
+                                        default = "claude-haiku-4-5-20251001"
+                                    },
+                                    extended_thinking = {default = true}
+                                }
+                            })
+                    end,
+                    claude_opus = function()
+                        return require("codecompanion.adapters").extend(
+                                   "anthropic", {
+                                name = "claude_opus",
+                                formatted_name = "Claude Opus",
+                                env = {api_key = get_api_key_cmd("anthropic")},
+                                schema = {
+                                    model = {
+                                        default = "claude-opus-4-5-20251101"
+                                    },
+                                    extended_thinking = {default = true}
+                                }
+                            })
+                    end,
+                    gemini_pro = function()
+                        return require("codecompanion.adapters").extend(
+                                   "gemini", {
+                                name = "gemini_pro",
+                                formatted_name = "Gemini Pro",
+                                env = {api_key = get_api_key_cmd("gemini")},
+                                schema = {model = {default = "gemini-2.5-pro"}}
+                            })
+                    end,
+                    gemini_flash = function()
+                        return require("codecompanion.adapters").extend(
+                                   "gemini", {
+                                name = "gemini_flash",
+                                formatted_name = "Gemini Flash",
+                                env = {api_key = get_api_key_cmd("gemini")},
+                                schema = {
+                                    model = {default = "gemini-2.5-flash"}
+                                }
+                            })
+                    end,
+                    -- Ollama adapter (experimental): loaded conditionally from ~/.config/codecompanion/ollama.json
+                    ollama = (function()
+                        if not ollama_config then
+                            return nil
+                        end
+                        return function()
+                            return require("codecompanion.adapters").extend(
+                                       "ollama", {
+                                    name = "ollama",
+                                    formatted_name = "Ollama",
+                                    env = {url = ollama_config.url},
+                                    schema = {
+                                        model = {default = ollama_config.model},
+                                        think = {default = true},
+                                        num_ctx = {
+                                            default = ollama_config.num_ctx
+                                        },
+                                        temperature = {default = 1.}
+                                    }
+                                })
+                        end
+                    end)()
+                }
             },
             prompt_library = {
+                ["Code Review - Grammar"] = {
+                    interaction = "chat",
+                    description = "Review the diff and provide feedback on typos and grammar",
+                    opts = {
+                        adapter = {name = maybe_ollama_if_configured()},
+                        index = 2,
+                        alias = "rg",
+                        auto_submit = true,
+                        user_prompt = false
+                    },
+                    prompts = {
+                        {
+                            role = constants.USER_ROLE,
+                            opts = {visible = false},
+                            content = function()
+                                local output = vim.fn.system(
+                                                   "jj diff --git --ignore-working-copy")
+                                return output or ""
+                            end
+                        }, {
+                            role = constants.USER_ROLE,
+                            content = "Review the current revision and provide feedback on typos and grammar. Do not comment on code structure. Provide the required changes in bullet points."
+                        }
+                    }
+                },
                 ["Code Review"] = {
-                    adapter = "claude_haiku",
-                    strategy = "chat",
+                    interaction = "chat",
                     description = "Review the current revision and provide feedback",
                     opts = {
                         index = 2,
-                        short_name = "r",
+                        alias = "r",
                         auto_submit = true,
                         user_prompt = false
                     },
@@ -468,12 +538,11 @@ Consult the knowledge base if you have any questions. If the knowledge base does
                     }
                 },
                 ["Commit"] = {
-                    adapter = "claude_haiku",
-                    strategy = "chat",
+                    interaction = "chat",
                     description = "Commit changes in the current revision",
                     opts = {
                         index = 2,
-                        short_name = "c",
+                        alias = "c",
                         auto_submit = true,
                         user_prompt = false
                     },
@@ -491,12 +560,11 @@ I have asked you to commit it, you don't need to ask for permission again]]
                     }
                 },
                 ["Commit Message"] = {
-                    adapter = "claude_haiku",
-                    strategy = "chat",
+                    interaction = "chat",
                     description = "Suggest a commit message based on the diff",
                     opts = {
                         index = 3,
-                        short_name = "cm",
+                        alias = "cm",
                         auto_submit = true,
                         user_prompt = false
                     },
@@ -513,9 +581,9 @@ I have asked you to commit it, you don't need to ask for permission again]]
                     }
                 },
                 ["Agent"] = {
-                    strategy = "workflow",
+                    interaction = "workflow",
                     description = "Use a workflow to repeatedly edit then test code",
-                    opts = {index = 1, short_name = "a"},
+                    opts = {index = 1, alias = "a", is_workflow = true},
                     prompts = {
                         {
                             {
@@ -605,10 +673,13 @@ Your instructions here]]
                     }
                 },
                 ["plan"] = {
-                    adapter = "claude_sonnet",
-                    strategy = "chat",
+                    interaction = "chat",
                     description = "Plan changes",
-                    opts = {index = 1, short_name = "p"},
+                    opts = {
+                        adapter = {name = "claude_sonnet"},
+                        index = 1,
+                        alias = "p"
+                    },
                     prompts = {
                         {
                             role = constants.USER_ROLE,
@@ -621,10 +692,14 @@ Task:
                     }
                 },
                 ["execute-plan"] = {
-                    adapter = "claude_sonnet",
-                    strategy = "chat",
+                    interaction = "chat",
                     description = "Execute plan in memory",
-                    opts = {index = 1, short_name = "xp", auto_submit = true},
+                    opts = {
+                        adapter = {name = "claude_sonnet"},
+                        index = 1,
+                        alias = "xp",
+                        auto_submit = true
+                    },
                     prompts = {
                         {
                             role = constants.USER_ROLE,
@@ -659,11 +734,11 @@ Task:
             desc = "Suggest commit message"
         }, {
             "<leader>rd",
-            "<cmd>CodeCompanionChat claude_sonnet<cr>",
+            "<cmd>CodeCompanionChat adapter=claude_sonnet<cr>",
             desc = "New Chat (Claude Sonnet)"
         }, {
             "<leader>rf",
-            "<cmd>CodeCompanionChat claude_haiku<cr>",
+            "<cmd>CodeCompanionChat adapter=claude_haiku<cr>",
             desc = "New Chat (Claude Haiku)"
         }, {
             "<leader>ra",
@@ -682,12 +757,12 @@ Task:
             "<leader>rp",
             "<cmd>CodeCompanion /p<cr>",
             desc = "Claude Sonnet Planner"
-        },
-        {
+        }, {
             "<leader>rx",
             "<cmd>CodeCompanion /xp<cr>",
-            desc = "Claude Sonnet Planner"
-        }
+            desc = "Claude Sonnet Execute Plan"
+        }, {"<leader>rg", "<cmd>CodeCompanion /rg<cr>", desc = "Review grammar"}
+
     }
 }
 
