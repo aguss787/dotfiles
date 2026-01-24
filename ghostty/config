@@ -45,3 +45,6 @@
 theme = catppuccin-mocha.conf
 background-opacity = 0.8
 confirm-close-surface = false
+
+keybind = option+backspace=text:\x17
+keybind = ctrl+backspace=text:\x17
