@@ -133,12 +133,14 @@ local function load_ollama_config()
         return nil
     end
 
-    if not config.url or not config.model then
+    if not config.model then
         vim.notify(
-            "[CodeCompanion] ollama.json missing required fields (url, model)",
+            "[CodeCompanion] ollama.json missing required fields (model)",
             vim.log.levels.WARN)
         return nil
     end
+
+    if not config.url then config.url = "http://localhost:11434" end
 
     if not config.num_ctx then config.num_ctx = 65536 end
 
