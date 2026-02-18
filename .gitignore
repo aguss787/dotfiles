@@ -1,3 +1,5 @@
 symkeeper.lock
 .nvim
 
+nvim/lua/local.lua
+nvim/lua/local/
