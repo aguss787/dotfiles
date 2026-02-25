@@ -59,14 +59,16 @@ local function get_context(bufnr, args)
 end
 
 -- Function to start an agent prompt with a specific adapter
-local function start_agent_prompt(adapter)
+local function start_agent_prompt(model)
     local actions = require("codecompanion.actions")
 
     local context = get_context(vim.api.nvim_get_current_buf(), {})
     local original_prompt = actions.resolve_from_alias("a", context)
 
     local prompt = vim.deepcopy(original_prompt)
-    prompt.adapter = adapter
+    if prompt.opts.adapter == nil then prompt.opts.adapter = {} end
+    prompt.opts.adapter.name = "claude"
+    prompt.opts.adapter.model = model
 
     return actions.resolve(prompt, context)
 end
@@ -152,7 +154,7 @@ local ollama_config = load_ollama_config()
 local function maybe_ollama_if_configured()
     if ollama_config then return "ollama" end
 
-    return "claude_haiku"
+    return "claude"
 end
 
 -- Helper function to generate API key command
@@ -327,7 +329,7 @@ DO NOT VIOLATE THESE RULES AT ANY COST.
             },
             strategies = {
                 chat = {
-                    adapter = "claude_haiku",
+                    adapter = "claude",
                     tools = {
                         groups = {
                             ["dev"] = {
@@ -373,7 +375,7 @@ Always read the README.md in your memory before doing anything.
                     }
                 },
                 inline = {
-                    adapter = "claude_haiku",
+                    adapter = "claude",
                     keymaps = {
                         accept_change = {
                             modes = {n = "ga"},
@@ -386,7 +388,7 @@ Always read the README.md in your memory before doing anything.
                     }
 
                 },
-                cmd = {adapter = "claude_haiku"}
+                cmd = {adapter = "claude"}
             },
             adapters = {
                 opts = {show_defaults = false},
@@ -408,44 +410,14 @@ Always read the README.md in your memory before doing anything.
                                 }
                             })
                     end,
-                    claude_sonnet = function()
+                    claude = function()
                         return require("codecompanion.adapters").extend(
                                    "anthropic", {
-                                name = "claude_sonnet",
-                                formatted_name = "Claude Sonnet",
+                                name = "claude",
+                                formatted_name = "Claude",
                                 env = {api_key = get_api_key_cmd("anthropic")},
                                 schema = {
-                                    model = {
-                                        default = "claude-sonnet-4-5-20250929"
-                                    },
-                                    extended_thinking = {default = true}
-                                }
-                            })
-                    end,
-                    claude_haiku = function()
-                        return require("codecompanion.adapters").extend(
-                                   "anthropic", {
-                                name = "claude_haiku",
-                                formatted_name = "Claude Haiku",
-                                env = {api_key = get_api_key_cmd("anthropic")},
-                                schema = {
-                                    model = {
-                                        default = "claude-haiku-4-5-20251001"
-                                    },
-                                    extended_thinking = {default = true}
-                                }
-                            })
-                    end,
-                    claude_opus = function()
-                        return require("codecompanion.adapters").extend(
-                                   "anthropic", {
-                                name = "claude_opus",
-                                formatted_name = "Claude Opus",
-                                env = {api_key = get_api_key_cmd("anthropic")},
-                                schema = {
-                                    model = {
-                                        default = "claude-opus-4-5-20251101"
-                                    },
+                                    model = {default = "claude-haiku-4-5"},
                                     extended_thinking = {default = true}
                                 }
                             })
@@ -678,7 +650,7 @@ Your instructions here]]
                     interaction = "chat",
                     description = "Plan changes",
                     opts = {
-                        adapter = {name = "claude_sonnet"},
+                        adapter = {name = "claude", model = "claude-sonnet-4-6"},
                         index = 1,
                         alias = "p"
                     },
@@ -697,7 +669,7 @@ Task:
                     interaction = "chat",
                     description = "Execute plan in memory",
                     opts = {
-                        adapter = {name = "claude_sonnet"},
+                        adapter = {name = "claude", model = "claude-sonnet-4-6"},
                         index = 1,
                         alias = "xp",
                         auto_submit = true
@@ -736,23 +708,23 @@ Task:
             desc = "Suggest commit message"
         }, {
             "<leader>rd",
-            "<cmd>CodeCompanionChat adapter=claude_sonnet<cr>",
+            "<cmd>CodeCompanionChat adapter=claude model=claude-sonnet-4-6<cr>",
             desc = "New Chat (Claude Sonnet)"
         }, {
             "<leader>rf",
-            "<cmd>CodeCompanionChat adapter=claude_haiku<cr>",
+            "<cmd>CodeCompanionChat adapter=claude model=claude-haiku-4-5<cr>",
             desc = "New Chat (Claude Haiku)"
         }, {
             "<leader>ra",
-            function() start_agent_prompt("claude_haiku") end,
+            function() start_agent_prompt("claude-haiku-4-5") end,
             desc = "Claude Haiku Agent"
         }, {
             "<leader>rA",
-            function() start_agent_prompt("claude_sonnet") end,
+            function() start_agent_prompt("claude-sonnet-4-6") end,
             desc = "Claude Sonnet Agent"
         }, {
             "<leader>ro",
-            function() start_agent_prompt("claude_opus") end,
+            function() start_agent_prompt("claude-opus-4-6") end,
             desc = "Claude Opus Agent"
         },
         {
