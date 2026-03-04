@@ -1,6 +1,5 @@
-local constants = {LLM_ROLE = "llm", USER_ROLE = "user", SYSTEM_ROLE = "system"}
-local commit_system_prompt =
-    [[@{cmd_runner} You will commit the code changes for the user. Follow these rules:
+local constants = { LLM_ROLE = "llm", USER_ROLE = "user", SYSTEM_ROLE = "system" }
+local commit_system_prompt = [[@{cmd_runner} You will commit the code changes for the user. Follow these rules:
 
 g Use `jj` if the repository is a Jujutsu (jj) repository
 - Use `jj diff --git --ignore-working-copy` to get the diff
@@ -14,7 +13,7 @@ g Use `jj` if the repository is a Jujutsu (jj) repository
     - use builtin_log_detailed as the template
     - use `jj desc`. DO NOT USE `jj commit`
 - You should make the title and body as clear and simple as possible. You should look at the project diff using mcp to understand what changes
-- You should add both title and body 
+- You should add both title and body
 - You SHOULD NOT adding reasons for the changes on the commit message. Only add the description of the changes.
   - Example of a good body:
     - "Remove X from enum XYZ"
@@ -37,8 +36,7 @@ g Use `jj` if the repository is a Jujutsu (jj) repository
 - You commit the changes using the commit message if the user asked for it
 ]]
 
-local code_review_system_prompt =
-    [[@{dev} You are a code reviewer. You will review the code and provide feedback.
+local code_review_system_prompt = [[@{dev} You are a code reviewer. You will review the code and provide feedback.
 
 run `jj diff --git --ignore-working-copy` to get the diff.
 
@@ -52,25 +50,27 @@ IMPORTANT:
 
 local context_utils
 local function get_context(bufnr, args)
-    if not context_utils then
-        context_utils = require("codecompanion.utils.context")
-    end
-    return context_utils.get(bufnr, args)
+	if not context_utils then
+		context_utils = require("codecompanion.utils.context")
+	end
+	return context_utils.get(bufnr, args)
 end
 
 -- Function to start an agent prompt with a specific adapter
 local function start_agent_prompt(model)
-    local actions = require("codecompanion.actions")
+	local actions = require("codecompanion.actions")
 
-    local context = get_context(vim.api.nvim_get_current_buf(), {})
-    local original_prompt = actions.resolve_from_alias("a", context)
+	local context = get_context(vim.api.nvim_get_current_buf(), {})
+	local original_prompt = actions.resolve_from_alias("a", context)
 
-    local prompt = vim.deepcopy(original_prompt)
-    if prompt.opts.adapter == nil then prompt.opts.adapter = {} end
-    prompt.opts.adapter.name = "claude"
-    prompt.opts.adapter.model = model
+	local prompt = vim.deepcopy(original_prompt)
+	if prompt.opts.adapter == nil then
+		prompt.opts.adapter = {}
+	end
+	prompt.opts.adapter.name = "claude"
+	prompt.opts.adapter.model = model
 
-    return actions.resolve(prompt, context)
+	return actions.resolve(prompt, context)
 end
 
 --- @class AiConfig
@@ -81,34 +81,38 @@ end
 --- @param file_path string
 --- @return AiConfig
 local function read_ai_config(file_path)
-    local file = io.open(file_path, "r")
-    if file then
-        local content = file:read("*all")
-        file:close()
-        local success, config_table = pcall(vim.fn.json_decode, content)
-        if success and config_table then return config_table end
-    end
-    return {}
+	local file = io.open(file_path, "r")
+	if file then
+		local content = file:read("*all")
+		file:close()
+		local success, config_table = pcall(vim.fn.json_decode, content)
+		if success and config_table then
+			return config_table
+		end
+	end
+	return {}
 end
 
 -- Function to get merged AI config from home and project directories
 --- @return AiConfig
 local function get_merged_ai_config()
-    -- Read from both home and project .ai.json files
-    local home_dir = os.getenv("HOME") or ""
-    local project_root = vim.fn.getcwd()
+	-- Read from both home and project .ai.json files
+	local home_dir = os.getenv("HOME") or ""
+	local project_root = vim.fn.getcwd()
 
-    local home_config_path = home_dir .. "/.ai.json"
-    local project_config_path = project_root .. "/.ai.json"
+	local home_config_path = home_dir .. "/.ai.json"
+	local project_config_path = project_root .. "/.ai.json"
 
-    -- Read home config first (as base)
-    local config = read_ai_config(home_config_path)
+	-- Read home config first (as base)
+	local config = read_ai_config(home_config_path)
 
-    -- Read project config and merge (project overrides home)
-    local project_config = read_ai_config(project_config_path)
-    for key, value in pairs(project_config) do config[key] = value end
+	-- Read project config and merge (project overrides home)
+	local project_config = read_ai_config(project_config_path)
+	for key, value in pairs(project_config) do
+		config[key] = value
+	end
 
-    return config
+	return config
 end
 
 --- @class OllamaConfig
@@ -121,59 +125,66 @@ end
 -- Expected format: { "url": "http://...", "model": "model-name", "num_ctx": 65536 }
 --- @return OllamaConfig|nil
 local function load_ollama_config()
-    local config_path = vim.fn.expand("~/.config/codecompanion/ollama.json")
-    local file = io.open(config_path, "r")
-    if not file then return nil end
+	local config_path = vim.fn.expand("~/.config/codecompanion/ollama.json")
+	local file = io.open(config_path, "r")
+	if not file then
+		return nil
+	end
 
-    local content = file:read("*all")
-    file:close()
+	local content = file:read("*all")
+	file:close()
 
-    local success, config = pcall(vim.fn.json_decode, content)
-    if not success or not config then
-        vim.notify("[CodeCompanion] Failed to parse ollama.json",
-                   vim.log.levels.WARN)
-        return nil
-    end
+	local success, config = pcall(vim.fn.json_decode, content)
+	if not success or not config then
+		vim.notify("[CodeCompanion] Failed to parse ollama.json", vim.log.levels.WARN)
+		return nil
+	end
 
-    if not config.model then
-        vim.notify(
-            "[CodeCompanion] ollama.json missing required fields (model)",
-            vim.log.levels.WARN)
-        return nil
-    end
+	if not config.model then
+		vim.notify("[CodeCompanion] ollama.json missing required fields (model)", vim.log.levels.WARN)
+		return nil
+	end
 
-    if not config.url then config.url = "http://localhost:11434" end
+	if not config.url then
+		config.url = "http://localhost:11434"
+	end
 
-    if not config.num_ctx then config.num_ctx = 65536 end
+	if not config.num_ctx then
+		config.num_ctx = 65536
+	end
 
-    return config
+	return config
 end
 
 local ollama_config = load_ollama_config()
 
 local function maybe_ollama_if_configured()
-    if ollama_config then return "ollama" end
+	if ollama_config then
+		return "ollama"
+	end
 
-    return "claude"
+	return "claude"
 end
 
 -- Helper function to generate API key command
 --- @param service_name string The name of the service (e.g., "anthropic", "gemini", "grok")
 --- @return string The command string to read and clean the API key
 local function get_api_key_cmd(service_name)
-    return string.format(
-               "cmd:cat ~/.config/codecompanion/%s.key | tr -d ' \\n'",
-               service_name)
+	return string.format("cmd:cat ~/.config/codecompanion/%s.key | tr -d ' \\n'", service_name)
 end
 
 local function default_system_prompt_func(args)
-    -- Determine the user's machine
-    local machine = vim.uv.os_uname().sysname
-    if machine == "Darwin" then machine = "Mac" end
-    if machine:find("Windows") then machine = "Windows" end
+	-- Determine the user's machine
+	local machine = vim.uv.os_uname().sysname
+	if machine == "Darwin" then
+		machine = "Mac"
+	end
+	if machine:find("Windows") then
+		machine = "Windows"
+	end
 
-    return string.format(
-               [[You are an AI programming assistant named "CodeCompanion", working within the Neovim text editor.
+	return string.format(
+		[[You are an AI programming assistant named "CodeCompanion", working within the Neovim text editor.
 
 You can answer general programming questions and perform the following tasks:
 * Answer general programming questions.
@@ -223,118 +234,125 @@ Additional context:
 The current date is %s.
 The user's Neovim version is %s.
 The user is working on a %s machine. Please respond with system specific commands if applicable.
-]], args.language or "English", os.date("%B %d, %Y"),
-               vim.version().major .. "." .. vim.version().minor .. "." ..
-                   vim.version().patch, machine)
+]],
+		args.language or "English",
+		os.date("%B %d, %Y"),
+		vim.version().major .. "." .. vim.version().minor .. "." .. vim.version().patch,
+		machine
+	)
 end
 
 return {
-    "olimorris/codecompanion.nvim",
-    lazy = false,
-    dependencies = {
-        "nvim-lua/plenary.nvim", "nvim-treesitter/nvim-treesitter",
-        "folke/noice.nvim", "OXY2DEV/markview.nvim", {
-            "ravitemer/mcphub.nvim",
-            enabled = false,
-            dependencies = {"nvim-lua/plenary.nvim"},
-            build = "npm install -g mcp-hub@latest", -- Installs `mcp-hub` node binary globally
-            config = function()
-                local mcphub = require("mcphub")
-                mcphub.setup({
-                    workspace = {
-                        look_for = {
-                            ".mcphub/servers.json", ".vscode/mcp.json",
-                            ".cursor/mcp.json", ".nvim/mcp.json"
-                        }
-                    },
-                    auto_approve = true,
-                    native_servers = {
-                        system_info = {
-                            name = "system_info",
-                            displayName = "System Info",
-                            capabilities = {
-                                resources = {
-                                    {
-                                        name = "cwd",
-                                        description = "Current working directory",
-                                        uri = "system://cwd",
-                                        handler = function(req, res)
-                                            if req.uri ~= "system://cwd" then
-                                                res:error("Invalid URI: " ..
-                                                              req.uri)
-                                            end
+	"olimorris/codecompanion.nvim",
+	lazy = false,
+	dependencies = {
+		"nvim-lua/plenary.nvim",
+		"nvim-treesitter/nvim-treesitter",
+		"folke/noice.nvim",
+		"OXY2DEV/markview.nvim",
+		{
+			"ravitemer/mcphub.nvim",
+			enabled = false,
+			dependencies = { "nvim-lua/plenary.nvim" },
+			build = "npm install -g mcp-hub@latest", -- Installs `mcp-hub` node binary globally
+			config = function()
+				local mcphub = require("mcphub")
+				mcphub.setup({
+					workspace = {
+						look_for = {
+							".mcphub/servers.json",
+							".vscode/mcp.json",
+							".cursor/mcp.json",
+							".nvim/mcp.json",
+						},
+					},
+					auto_approve = true,
+					native_servers = {
+						system_info = {
+							name = "system_info",
+							displayName = "System Info",
+							capabilities = {
+								resources = {
+									{
+										name = "cwd",
+										description = "Current working directory",
+										uri = "system://cwd",
+										handler = function(req, res)
+											if req.uri ~= "system://cwd" then
+												res:error("Invalid URI: " .. req.uri)
+											end
 
-                                            local cwd = vim.fn.getcwd()
-                                            return res:text(cwd)
-                                        end
-                                    }
-                                }
-                            }
-                        }
-                    }
-                })
-            end
-        }
-    },
-    init = function()
-        require("agus.functions.codecompanion-notification").init()
-    end,
-    config = function()
-        -- local default_config = vim.deepcopy(
-        --                            require("codecompanion.config").config)
+											local cwd = vim.fn.getcwd()
+											return res:text(cwd)
+										end,
+									},
+								},
+							},
+						},
+					},
+				})
+			end,
+		},
+	},
+	init = function()
+		require("agus.functions.codecompanion-notification").init()
+	end,
+	config = function()
+		-- local default_config = vim.deepcopy(
+		--                            require("codecompanion.config").config)
 
-        local system_prompt = function(opts)
-            local default_system_prompt = default_system_prompt_func(opts)
-            -- local default_system_prompt = default_config.opts
-            --                                   .system_prompt(opts)
-            local rules = get_merged_ai_config().rules
+		local system_prompt = function(opts)
+			local default_system_prompt = default_system_prompt_func(opts)
+			-- local default_system_prompt = default_config.opts
+			--                                   .system_prompt(opts)
+			local rules = get_merged_ai_config().rules
 
-            local llm_rule = ""
-            if rules ~= nil then
-                llm_rule = [[
+			local llm_rule = ""
+			if rules ~= nil then
+				llm_rule = [[
 
 
 <<IMPORANT>>
 You should follow the following rules to the letter:
 ]]
-                for _, rule in ipairs(rules) do
-                    llm_rule = llm_rule .. "- " .. rule .. "\n"
-                end
-                llm_rule = llm_rule .. [[
+				for _, rule in ipairs(rules) do
+					llm_rule = llm_rule .. "- " .. rule .. "\n"
+				end
+				llm_rule = llm_rule .. [[
 
 DO NOT VIOLATE THESE RULES AT ANY COST.
 <<IMPORANT SECTION END>>
 ]]
-            end
+			end
 
-            return default_system_prompt .. llm_rule
-        end
+			return default_system_prompt .. llm_rule
+		end
 
-        require("codecompanion").setup({
-            opts = {
-                log_level = "INFO",
-                job_start_delay = 100,
-                submit_delay = 100,
-                system_prompt = system_prompt
-            },
-            extensions = {
-                -- mcphub = {
-                --     callback = "mcphub.extensions.codecompanion",
-                --     opts = {
-                --         make_vars = true,
-                --         make_slash_commands = true,
-                --         show_result_in_chat = true
-                --     }
-                -- }
-            },
-            strategies = {
-                chat = {
-                    adapter = "claude",
-                    tools = {
-                        groups = {
-                            ["dev"] = {
-                                description = "Full Stack Developer - Can run code, edit code and modify files",
-                                prompt = [[ I'm giving you access to the ${tools} to help you perform coding tasks. 
+		require("codecompanion").setup({
+			opts = {
+				log_level = "INFO",
+				job_start_delay = 100,
+				submit_delay = 100,
+				system_prompt = system_prompt,
+			},
+			extensions = {
+				-- mcphub = {
+				--     callback = "mcphub.extensions.codecompanion",
+				--     opts = {
+				--         make_vars = true,
+				--         make_slash_commands = true,
+				--         show_result_in_chat = true
+				--     }
+				-- }
+			},
+			strategies = {
+				chat = {
+					adapter = "claude",
+					tools = {
+						groups = {
+							["dev"] = {
+								description = "Full Stack Developer - Can run code, edit code and modify files",
+								prompt = [[ I'm giving you access to the ${tools} to help you perform coding tasks.
 
 Memory tools are super important, and you have to be organized with it. Use the following structure to organize your though:
   - README.md # contains the summary of the project, current active task, etc
@@ -355,235 +373,235 @@ Memory tools are super important, and you have to be organized with it. Use the 
 Always read the README.md in your memory before doing anything.
 <<IMPORANT SECTION END>>
 ]],
-                                tools = {
-                                    "cmd_runner", "create_file", "delete_file",
-                                    "file_search", "get_changed_files",
-                                    "grep_search", "insert_edit_into_file",
-                                    "list_code_usages", "read_file", "memory"
-                                },
-                                opts = {collapse_tools = true}
-                            }
-                        },
+								tools = {
+									"cmd_runner",
+									"create_file",
+									"delete_file",
+									"file_search",
+									"get_changed_files",
+									"grep_search",
+									"insert_edit_into_file",
+									"list_code_usages",
+									"read_file",
+									"memory",
+								},
+								opts = { collapse_tools = true },
+							},
+						},
 
-                        ["memory"] = {opts = {requires_approval_before = false}},
-                        opts = {
-                            default_tools = {
-                                -- "full_stack_dev"
-                                -- "use_mcp_tool", "access_mcp_resource", "mcp"
-                            }
-                        }
-                    }
-                },
-                inline = {
-                    adapter = "claude",
-                    keymaps = {
-                        accept_change = {
-                            modes = {n = "ga"},
-                            description = "Accept the suggested change"
-                        },
-                        reject_change = {
-                            modes = {n = "gr"},
-                            description = "Reject the suggested change"
-                        }
-                    }
-
-                },
-                cmd = {adapter = "claude"}
-            },
-            adapters = {
-                opts = {show_defaults = false},
-                http = {
-                    grok = function()
-                        return require("codecompanion.adapters").extend(
-                                   "gemini", {
-                                name = "grok",
-                                formatted_name = "Grok",
-                                url = "https://api.x.ai/v1/chat/completions",
-                                env = {api_key = get_api_key_cmd("grok")},
-                                opts = {
-                                    stream = true,
-                                    tools = true,
-                                    vision = true
-                                },
-                                schema = {
-                                    model = {default = "grok-4-fast-reasoning"}
-                                }
-                            })
-                    end,
-                    claude = function()
-                        return require("codecompanion.adapters").extend(
-                                   "anthropic", {
-                                name = "claude",
-                                formatted_name = "Claude",
-                                env = {api_key = get_api_key_cmd("anthropic")},
-                                schema = {
-                                    model = {default = "claude-haiku-4-5"},
-                                    extended_thinking = {default = true}
-                                }
-                            })
-                    end,
-                    gemini_pro = function()
-                        return require("codecompanion.adapters").extend(
-                                   "gemini", {
-                                name = "gemini_pro",
-                                formatted_name = "Gemini Pro",
-                                env = {api_key = get_api_key_cmd("gemini")},
-                                schema = {model = {default = "gemini-2.5-pro"}}
-                            })
-                    end,
-                    gemini_flash = function()
-                        return require("codecompanion.adapters").extend(
-                                   "gemini", {
-                                name = "gemini_flash",
-                                formatted_name = "Gemini Flash",
-                                env = {api_key = get_api_key_cmd("gemini")},
-                                schema = {
-                                    model = {default = "gemini-2.5-flash"}
-                                }
-                            })
-                    end,
-                    -- Ollama adapter (experimental): loaded conditionally from ~/.config/codecompanion/ollama.json
-                    ollama = (function()
-                        if not ollama_config then
-                            return nil
-                        end
-                        return function()
-                            return require("codecompanion.adapters").extend(
-                                       "ollama", {
-                                    name = "ollama",
-                                    formatted_name = "Ollama",
-                                    env = {url = ollama_config.url},
-                                    schema = {
-                                        model = {default = ollama_config.model},
-                                        think = {default = true},
-                                        num_ctx = {
-                                            default = ollama_config.num_ctx
-                                        },
-                                        temperature = {default = 1.}
-                                    }
-                                })
-                        end
-                    end)()
-                }
-            },
-            prompt_library = {
-                ["Code Review - Grammar"] = {
-                    interaction = "chat",
-                    description = "Review the diff and provide feedback on typos and grammar",
-                    opts = {
-                        adapter = {name = maybe_ollama_if_configured()},
-                        index = 2,
-                        alias = "rg",
-                        auto_submit = true,
-                        user_prompt = false
-                    },
-                    prompts = {
-                        {
-                            role = constants.USER_ROLE,
-                            opts = {visible = false},
-                            content = function()
-                                local output = vim.fn.system(
-                                                   "jj diff --git --ignore-working-copy")
-                                return output or ""
-                            end
-                        }, {
-                            role = constants.USER_ROLE,
-                            content = "Review the current revision and provide feedback on typos and grammar. Do not comment on code structure. Provide the required changes in bullet points."
-                        }
-                    }
-                },
-                ["Code Review"] = {
-                    interaction = "chat",
-                    description = "Review the current revision and provide feedback",
-                    opts = {
-                        index = 2,
-                        alias = "r",
-                        auto_submit = true,
-                        user_prompt = false
-                    },
-                    prompts = {
-                        {
-                            role = constants.USER_ROLE,
-                            content = function()
-                                vim.g.codecompanion_auto_tool_mode = true
-                                return code_review_system_prompt
-                            end
-                        }
-                    }
-                },
-                ["Commit"] = {
-                    interaction = "chat",
-                    description = "Commit changes in the current revision",
-                    opts = {
-                        index = 2,
-                        alias = "c",
-                        auto_submit = true,
-                        user_prompt = false
-                    },
-                    prompts = {
-                        {
-                            role = constants.USER_ROLE,
-                            content = function()
-                                vim.g.codecompanion_auto_tool_mode = true
-                                return commit_system_prompt ..
-                                           [[commit changes in the current revision. 
+						["memory"] = { opts = { requires_approval_before = false } },
+						opts = {
+							default_tools = {
+								-- "full_stack_dev"
+								-- "use_mcp_tool", "access_mcp_resource", "mcp"
+							},
+						},
+					},
+				},
+				inline = {
+					adapter = "claude",
+					keymaps = {
+						accept_change = {
+							modes = { n = "ga" },
+							description = "Accept the suggested change",
+						},
+						reject_change = {
+							modes = { n = "gr" },
+							description = "Reject the suggested change",
+						},
+					},
+				},
+				cmd = { adapter = "claude" },
+			},
+			adapters = {
+				opts = { show_defaults = false },
+				http = {
+					grok = function()
+						return require("codecompanion.adapters").extend("gemini", {
+							name = "grok",
+							formatted_name = "Grok",
+							url = "https://api.x.ai/v1/chat/completions",
+							env = { api_key = get_api_key_cmd("grok") },
+							opts = {
+								stream = true,
+								tools = true,
+								vision = true,
+							},
+							schema = {
+								model = { default = "grok-4-fast-reasoning" },
+							},
+						})
+					end,
+					claude = function()
+						return require("codecompanion.adapters").extend("anthropic", {
+							name = "claude",
+							formatted_name = "Claude",
+							env = { api_key = get_api_key_cmd("anthropic") },
+							schema = {
+								model = { default = "claude-haiku-4-5" },
+								extended_thinking = { default = true },
+							},
+						})
+					end,
+					gemini_pro = function()
+						return require("codecompanion.adapters").extend("gemini", {
+							name = "gemini_pro",
+							formatted_name = "Gemini Pro",
+							env = { api_key = get_api_key_cmd("gemini") },
+							schema = { model = { default = "gemini-2.5-pro" } },
+						})
+					end,
+					gemini_flash = function()
+						return require("codecompanion.adapters").extend("gemini", {
+							name = "gemini_flash",
+							formatted_name = "Gemini Flash",
+							env = { api_key = get_api_key_cmd("gemini") },
+							schema = {
+								model = { default = "gemini-2.5-flash" },
+							},
+						})
+					end,
+					-- Ollama adapter (experimental): loaded conditionally from ~/.config/codecompanion/ollama.json
+					ollama = (function()
+						if not ollama_config then
+							return nil
+						end
+						return function()
+							return require("codecompanion.adapters").extend("ollama", {
+								name = "ollama",
+								formatted_name = "Ollama",
+								env = { url = ollama_config.url },
+								schema = {
+									model = { default = ollama_config.model },
+									think = { default = true },
+									num_ctx = {
+										default = ollama_config.num_ctx,
+									},
+									temperature = { default = 1. },
+								},
+							})
+						end
+					end)(),
+				},
+			},
+			prompt_library = {
+				["Code Review - Grammar"] = {
+					interaction = "chat",
+					description = "Review the diff and provide feedback on typos and grammar",
+					opts = {
+						adapter = { name = maybe_ollama_if_configured() },
+						index = 2,
+						alias = "rg",
+						auto_submit = true,
+						user_prompt = false,
+					},
+					prompts = {
+						{
+							role = constants.USER_ROLE,
+							opts = { visible = false },
+							content = function()
+								local output = vim.fn.system("jj diff --git --ignore-working-copy")
+								return output or ""
+							end,
+						},
+						{
+							role = constants.USER_ROLE,
+							content = "Review the current revision and provide feedback on typos and grammar. Do not comment on code structure. Provide the required changes in bullet points.",
+						},
+					},
+				},
+				["Code Review"] = {
+					interaction = "chat",
+					description = "Review the current revision and provide feedback",
+					opts = {
+						index = 2,
+						alias = "r",
+						auto_submit = true,
+						user_prompt = false,
+					},
+					prompts = {
+						{
+							role = constants.USER_ROLE,
+							content = function()
+								vim.g.codecompanion_auto_tool_mode = true
+								return code_review_system_prompt
+							end,
+						},
+					},
+				},
+				["Commit"] = {
+					interaction = "chat",
+					description = "Commit changes in the current revision",
+					opts = {
+						index = 2,
+						alias = "c",
+						auto_submit = true,
+						user_prompt = false,
+					},
+					prompts = {
+						{
+							role = constants.USER_ROLE,
+							content = function()
+								vim.g.codecompanion_auto_tool_mode = true
+								return commit_system_prompt
+									.. [[commit changes in the current revision.
 
 I have asked you to commit it, you don't need to ask for permission again]]
-                            end
-                        }
-                    }
-                },
-                ["Commit Message"] = {
-                    interaction = "chat",
-                    description = "Suggest a commit message based on the diff",
-                    opts = {
-                        index = 3,
-                        alias = "cm",
-                        auto_submit = true,
-                        user_prompt = false
-                    },
-                    prompts = {
-                        {
-                            role = constants.SYSTEM_ROLE,
-                            content = commit_system_prompt,
-                            opts = {visible = false}
-                        }, {
-                            role = constants.USER_ROLE,
-                            content = commit_system_prompt ..
-                                "Suggent a commit message based on the diff. DO NOT COMMIT THE REVISION."
-                        }
-                    }
-                },
-                ["Agent"] = {
-                    interaction = "workflow",
-                    description = "Use a workflow to repeatedly edit then test code",
-                    opts = {index = 1, alias = "a", is_workflow = true},
-                    prompts = {
-                        {
-                            {
-                                name = "Setup Test",
-                                role = constants.USER_ROLE,
-                                opts = {auto_submit = false},
-                                content = function()
-                                    -- Enable turbo mode!!!
-                                    vim.g.codecompanion_auto_tool_mode = true
+							end,
+						},
+					},
+				},
+				["Commit Message"] = {
+					interaction = "chat",
+					description = "Suggest a commit message based on the diff",
+					opts = {
+						index = 3,
+						alias = "cm",
+						auto_submit = true,
+						user_prompt = false,
+					},
+					prompts = {
+						{
+							role = constants.SYSTEM_ROLE,
+							content = commit_system_prompt,
+							opts = { visible = false },
+						},
+						{
+							role = constants.USER_ROLE,
+							content = commit_system_prompt
+								.. "Suggent a commit message based on the diff. DO NOT COMMIT THE REVISION.",
+						},
+					},
+				},
+				["Agent"] = {
+					interaction = "workflow",
+					description = "Use a workflow to repeatedly edit then test code",
+					opts = { index = 1, alias = "a", is_workflow = true },
+					prompts = {
+						{
+							{
+								name = "Setup Test",
+								role = constants.USER_ROLE,
+								opts = { auto_submit = false },
+								content = function()
+									-- Enable turbo mode!!!
+									vim.g.codecompanion_auto_tool_mode = true
 
-                                    -- Get merged AI config
-                                    local config = get_merged_ai_config()
+									-- Get merged AI config
+									local config = get_merged_ai_config()
 
-                                    -- Extract test_cmd with fallback
-                                    local test_cmd = config.test_cmd or ""
+									-- Extract test_cmd with fallback
+									local test_cmd = config.test_cmd or ""
 
-                                    local step_header =
-                                        "@{dev} You are required to write code following the instructions provided below"
-                                    if test_cmd ~= "" then
-                                        step_header = step_header ..
-                                                          " and test the correctness by running the designated test suite"
-                                    end
-                                    step_header = step_header .. "."
+									local step_header =
+										"@{dev} You are required to write code following the instructions provided below"
+									if test_cmd ~= "" then
+										step_header = step_header
+											.. " and test the correctness by running the designated test suite"
+									end
+									step_header = step_header .. "."
 
-                                    local steps_content =
-                                        [[### Steps to Follow
+									local steps_content = [[### Steps to Follow
 
 ]] .. step_header .. [[ Follow these steps exactly:
 
@@ -592,151 +610,162 @@ I have asked you to commit it, you don't need to ask for permission again]]
 3. Update the code in the project.
 ]]
 
-                                    local test_steps = ""
-                                    if test_cmd ~= "" then
-                                        test_steps = string.format(
-                                                         [[4. Then use the cmd_runner tool to run the test suite with `%s` (do this after you have updated the code)]],
-                                                         test_cmd)
-                                    else
-                                        test_steps =
-                                            [[4. Then use the cmd_runner tool to run the test suite]]
-                                    end
-                                    test_steps = test_steps ..
-                                                     "\n5. Make sure you trigger both tools in the same response"
+									local test_steps = ""
+									if test_cmd ~= "" then
+										test_steps = string.format(
+											[[4. Then use the cmd_runner tool to run the test suite with `%s` (do this after you have updated the code)]],
+											test_cmd
+										)
+									else
+										test_steps = [[4. Then use the cmd_runner tool to run the test suite]]
+									end
+									test_steps = test_steps
+										.. "\n5. Make sure you trigger both tools in the same response"
 
-                                    local repeat_step = ""
-                                    if test_cmd ~= "" then
-                                        repeat_step =
-                                            "We\'ll repeat this cycle until the requirements is met. "
-                                    end
+									local repeat_step = ""
+									if test_cmd ~= "" then
+										repeat_step = "We'll repeat this cycle until the requirements is met. "
+									end
 
-                                    return
-                                        steps_content .. test_steps .. "\n\n" ..
-                                            repeat_step ..
-                                            [[Ensure no deviations from these steps.
+									return steps_content
+										.. test_steps
+										.. "\n\n"
+										.. repeat_step
+										.. [[Ensure no deviations from these steps.
 
 Hints:
-- Always read the file using mcp tool before making any changes to make sure you edit the file correctly. 
+- Always read the file using mcp tool before making any changes to make sure you edit the file correctly.
 - Use context7 when you have issues with external library
 
 ### Instructions
 
 Your instructions here]]
-                                end
-                            }
-                        }, {
-                            {
-                                name = "Repeat On Failure",
-                                role = constants.USER_ROLE,
-                                opts = {auto_submit = true},
-                                -- Scope this prompt to the cmd_runner tool
-                                condition = function()
-                                    return
-                                        _G.codecompanion_current_tool ==
-                                            "cmd_runner"
-                                end,
-                                -- Repeat until the tests pass, as indicated by the testing flag
-                                -- which the cmd_runner tool sets on the chat buffer
-                                repeat_until = function(chat)
-                                    return
-                                        chat.tool_registry.flags.testing == true
-                                end,
-                                content = "Make sure the code works"
-                            }
-                        }
-                    }
-                },
-                ["plan"] = {
-                    interaction = "chat",
-                    description = "Plan changes",
-                    opts = {
-                        adapter = {name = "claude", model = "claude-sonnet-4-6"},
-                        index = 1,
-                        alias = "p"
-                    },
-                    prompts = {
-                        {
-                            role = constants.USER_ROLE,
-                            content = [[@{dev} Write a plan and todos for the following task. write them as detail as possible. Store your plan and todos in your memory.
+								end,
+							},
+						},
+						{
+							{
+								name = "Repeat On Failure",
+								role = constants.USER_ROLE,
+								opts = { auto_submit = true },
+								-- Scope this prompt to the cmd_runner tool
+								condition = function()
+									return _G.codecompanion_current_tool == "cmd_runner"
+								end,
+								-- Repeat until the tests pass, as indicated by the testing flag
+								-- which the cmd_runner tool sets on the chat buffer
+								repeat_until = function(chat)
+									return chat.tool_registry.flags.testing == true
+								end,
+								content = "Make sure the code works",
+							},
+						},
+					},
+				},
+				["plan"] = {
+					interaction = "chat",
+					description = "Plan changes",
+					opts = {
+						adapter = { name = "claude", model = "claude-sonnet-4-6" },
+						index = 1,
+						alias = "p",
+					},
+					prompts = {
+						{
+							role = constants.USER_ROLE,
+							content = [[@{dev} Write a plan and todos for the following task. write them as detail as possible. Store your plan and todos in your memory.
+Do not execute the plan until explicitly told to do so.
 
 Task:
 ]],
-                            opts = {visible = true}
-                        }
-                    }
-                },
-                ["execute-plan"] = {
-                    interaction = "chat",
-                    description = "Execute plan in memory",
-                    opts = {
-                        adapter = {name = "claude", model = "claude-sonnet-4-6"},
-                        index = 1,
-                        alias = "xp",
-                        auto_submit = true
-                    },
-                    prompts = {
-                        {
-                            role = constants.USER_ROLE,
-                            content = [[@{dev} Execute the current task]],
-                            opts = {visible = true}
-                        }
-                    }
-                }
-            },
-            display = {
-                action_palette = {opts = {show_default_prompt_library = false}},
-                chat = {show_tool_processing = true},
-                diff = {enabled = true}
-            }
-        })
-    end,
+							opts = { visible = true },
+						},
+					},
+				},
+				["execute-plan"] = {
+					interaction = "chat",
+					description = "Execute plan in memory",
+					opts = {
+						adapter = { name = "claude", model = "claude-sonnet-4-6" },
+						index = 1,
+						alias = "xp",
+						auto_submit = true,
+					},
+					prompts = {
+						{
+							role = constants.USER_ROLE,
+							content = [[@{dev} Execute the current task]],
+							opts = { visible = true },
+						},
+					},
+				},
+			},
+			display = {
+				action_palette = { opts = { show_default_prompt_library = false } },
+				chat = { show_tool_processing = true },
+				diff = { enabled = true },
+			},
+		})
+	end,
 
-    keys = {
-        {
-            "<leader>rr",
-            "<cmd>CodeCompanionChat toggle<cr>",
-            desc = "Toggle chat"
-        },
-        {
-            "<leader>fr",
-            "<cmd>CodeCompanionAction<cr>",
-            desc = "Code Companion Actions"
-        }, {"<leader>rC", "<cmd>CodeCompanion /c<cr>", desc = "Commit"},
-        {
-            "<leader>rc",
-            "<cmd>CodeCompanion /cm<cr>",
-            desc = "Suggest commit message"
-        }, {
-            "<leader>rd",
-            "<cmd>CodeCompanionChat adapter=claude model=claude-sonnet-4-6<cr>",
-            desc = "New Chat (Claude Sonnet)"
-        }, {
-            "<leader>rf",
-            "<cmd>CodeCompanionChat adapter=claude model=claude-haiku-4-5<cr>",
-            desc = "New Chat (Claude Haiku)"
-        }, {
-            "<leader>ra",
-            function() start_agent_prompt("claude-haiku-4-5") end,
-            desc = "Claude Haiku Agent"
-        }, {
-            "<leader>rA",
-            function() start_agent_prompt("claude-sonnet-4-6") end,
-            desc = "Claude Sonnet Agent"
-        }, {
-            "<leader>ro",
-            function() start_agent_prompt("claude-opus-4-6") end,
-            desc = "Claude Opus Agent"
-        },
-        {
-            "<leader>rp",
-            "<cmd>CodeCompanion /p<cr>",
-            desc = "Claude Sonnet Planner"
-        }, {
-            "<leader>rx",
-            "<cmd>CodeCompanion /xp<cr>",
-            desc = "Claude Sonnet Execute Plan"
-        }, {"<leader>rg", "<cmd>CodeCompanion /rg<cr>", desc = "Review grammar"}
-
-    }
+	keys = {
+		{
+			"<leader>rr",
+			"<cmd>CodeCompanionChat toggle<cr>",
+			desc = "Toggle chat",
+		},
+		{
+			"<leader>fr",
+			"<cmd>CodeCompanionAction<cr>",
+			desc = "Code Companion Actions",
+		},
+		{ "<leader>rC", "<cmd>CodeCompanion /c<cr>", desc = "Commit" },
+		{
+			"<leader>rc",
+			"<cmd>CodeCompanion /cm<cr>",
+			desc = "Suggest commit message",
+		},
+		{
+			"<leader>rd",
+			"<cmd>CodeCompanionChat adapter=claude model=claude-sonnet-4-6<cr>",
+			desc = "New Chat (Claude Sonnet)",
+		},
+		{
+			"<leader>rf",
+			"<cmd>CodeCompanionChat adapter=claude model=claude-haiku-4-5<cr>",
+			desc = "New Chat (Claude Haiku)",
+		},
+		{
+			"<leader>ra",
+			function()
+				start_agent_prompt("claude-haiku-4-5")
+			end,
+			desc = "Claude Haiku Agent",
+		},
+		{
+			"<leader>rA",
+			function()
+				start_agent_prompt("claude-sonnet-4-6")
+			end,
+			desc = "Claude Sonnet Agent",
+		},
+		{
+			"<leader>ro",
+			function()
+				start_agent_prompt("claude-opus-4-6")
+			end,
+			desc = "Claude Opus Agent",
+		},
+		{
+			"<leader>rp",
+			"<cmd>CodeCompanion /p<cr>",
+			desc = "Claude Sonnet Planner",
+		},
+		{
+			"<leader>rx",
+			"<cmd>CodeCompanion /xp<cr>",
+			desc = "Claude Sonnet Execute Plan",
+		},
+		{ "<leader>rg", "<cmd>CodeCompanion /rg<cr>", desc = "Review grammar" },
+	},
 }
-
