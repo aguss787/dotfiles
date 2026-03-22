@@ -63,6 +63,11 @@ local function start_agent_prompt(model)
 	local context = get_context(vim.api.nvim_get_current_buf(), {})
 	local original_prompt = actions.resolve_from_alias("a", context)
 
+	if not original_prompt then
+		vim.notify("CodeCompanion: No prompt found for alias 'a'", vim.log.levels.ERROR)
+		return
+	end
+
 	local prompt = vim.deepcopy(original_prompt)
 	if prompt.opts.adapter == nil then
 		prompt.opts.adapter = {}
@@ -250,49 +255,6 @@ return {
 		"nvim-treesitter/nvim-treesitter",
 		"folke/noice.nvim",
 		"OXY2DEV/markview.nvim",
-		{
-			"ravitemer/mcphub.nvim",
-			enabled = false,
-			dependencies = { "nvim-lua/plenary.nvim" },
-			build = "npm install -g mcp-hub@latest", -- Installs `mcp-hub` node binary globally
-			config = function()
-				local mcphub = require("mcphub")
-				mcphub.setup({
-					workspace = {
-						look_for = {
-							".mcphub/servers.json",
-							".vscode/mcp.json",
-							".cursor/mcp.json",
-							".nvim/mcp.json",
-						},
-					},
-					auto_approve = true,
-					native_servers = {
-						system_info = {
-							name = "system_info",
-							displayName = "System Info",
-							capabilities = {
-								resources = {
-									{
-										name = "cwd",
-										description = "Current working directory",
-										uri = "system://cwd",
-										handler = function(req, res)
-											if req.uri ~= "system://cwd" then
-												res:error("Invalid URI: " .. req.uri)
-											end
-
-											local cwd = vim.fn.getcwd()
-											return res:text(cwd)
-										end,
-									},
-								},
-							},
-						},
-					},
-				})
-			end,
-		},
 	},
 	init = function()
 		require("agus.functions.codecompanion-notification").init()
@@ -335,16 +297,7 @@ DO NOT VIOLATE THESE RULES AT ANY COST.
 				submit_delay = 100,
 				system_prompt = system_prompt,
 			},
-			extensions = {
-				-- mcphub = {
-				--     callback = "mcphub.extensions.codecompanion",
-				--     opts = {
-				--         make_vars = true,
-				--         make_slash_commands = true,
-				--         show_result_in_chat = true
-				--     }
-				-- }
-			},
+			extensions = {},
 			strategies = {
 				chat = {
 					adapter = "claude",
