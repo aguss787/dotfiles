@@ -1,9 +1,10 @@
 return {
 	"nvim-treesitter/nvim-treesitter",
 	build = ":TSUpdate",
+	branch = "main",
 	config = function()
 		---@diagnostic disable-next-line: missing-fields
-		require("nvim-treesitter.configs").setup({
+		require("nvim-treesitter").setup({
 			highlight = { enable = true },
 			incremental_selection = { enable = true },
 			ensure_installed = {
